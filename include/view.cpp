@@ -1,0 +1,33 @@
+
+
+#define GL_GLEXT_PROTOTYPES 1
+
+#include "view.h"
+
+
+void My_renderer::initRender(){
+
+    SDL_CreateWindowAndRenderer(screen_width, screen_height, 0, &window, nullptr);
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+    
+    // glGenVertexArraysOES(1, &vao);
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // glBindVertexArrayOES(vao);
+    
+    my_shader.initShader("./include/shaders/vertex_shader.vs","./include/shaders/fragment_shader.fs");
+    my_shader.activate();
+
+    // Specify the layout of the vertex data
+    GLint posAttrib = my_shader.getAttribLocation("position");
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    
+}
