@@ -2,12 +2,11 @@
 #define EVENT_HANDLER_H
 
 #include <SDL.h>
-#include "chunk.h"
 #include "camera.h"
 
 class EventHandler{
 public:
-    void update(SDL_Event *e, Chunk &my_chunk, Camera &camera);
+    void update(SDL_Event *e, Camera &camera);
     int prev_x;
     int prev_y;
     bool right_click_depressed;

@@ -7,9 +7,9 @@
 #define GL_GLEXT_PROTOTYPES 1
 
 #include "view.h"
-#include "chunk.h"
 #include "event_handler.h"
 #include "camera.h"
+#include "world.h"
 
 
 // // an example of something we will control from the javascript side
@@ -24,23 +24,22 @@ void main_loop() { loop(); }
 int main()
 {
 
-    My_renderer my_rend;
+    Renderer renderer;
+    renderer.initRender();
 
-    Chunk my_chunk;
-
-    my_rend.initRender();
+    World world;
+    world.initWorld();
 
     EventHandler events;
-
-    SDL_Event e;
+    SDL_Event evenHolder;
 
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     loop = [&]
     {
-		events.update(&e, my_chunk, camera);
+		events.update(&evenHolder, camera);
 
-        my_chunk.renderChunk(my_rend, camera);
+        world.render(renderer, camera);
     };
 
     // https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/

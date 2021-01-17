@@ -1,6 +1,6 @@
 #include "event_handler.h"
 
-void EventHandler::update(SDL_Event *e, Chunk &my_chunk, Camera &camera){
+void EventHandler::update(SDL_Event *e, Camera &camera){
 
 
     while(SDL_PollEvent(e) != 0){

@@ -5,7 +5,7 @@
 #include "view.h"
 
 
-void My_renderer::initRender(){
+void Renderer::initRender(){
 
     SDL_CreateWindowAndRenderer(screen_width, screen_height, 0, &window, nullptr);
 

@@ -1,1 +1,1 @@
-emcc -I./include main.cpp include/view.cpp include/chunk.cpp include/shader.cpp include/event_handler.cpp include/camera.cpp -std=c++11 -s WASM=1 -s USE_SDL=2 -O1 -s LLD_REPORT_UNDEFINED --preload-file include/shaders -o index.jsSome error occurs with -O0 but goes away with -O3.
+emcc -I./include main.cpp include/view.cpp include/chunk.cpp include/shader.cpp include/event_handler.cpp include/camera.cpp include/world.cpp -std=c++11 -s WASM=1 -s USE_SDL=2 -O1 -s LLD_REPORT_UNDEFINED --preload-file include/shaders -o index.js --preload-file include/shaders -o index.js

@@ -13,7 +13,7 @@ int add(int x, int y);
 
 float getBackgroundColor();
 
-class My_renderer{
+class Renderer{
 public:
     const int screen_width = 800;
     const int screen_height = 600;

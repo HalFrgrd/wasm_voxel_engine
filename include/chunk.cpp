@@ -1,7 +1,7 @@
 #include "chunk.h"
 
 
-void Chunk::renderChunk(My_renderer &renderer, Camera &camera){
+void Chunk::renderChunk(Renderer &renderer, Camera &camera){
 
 
     // glm::mat4 trans = glm::mat4(1.0f);
@@ -25,7 +25,7 @@ void Chunk::renderChunk(My_renderer &renderer, Camera &camera){
     glClear(GL_COLOR_BUFFER_BIT);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer.vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Block::vertices), Block::vertices, GL_STATIC_DRAW);
 
     // glBindVertexArray(renderer.vao);
     for (unsigned int i = 0; i < 10; i++)
@@ -39,20 +39,6 @@ void Chunk::renderChunk(My_renderer &renderer, Camera &camera){
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-
-
-    // move a vertex
-    // const uint32_t milliseconds_since_start = SDL_GetTicks();
-    // const uint32_t milliseconds_per_loop = 3000;
-    // vertices[0] = ( milliseconds_since_start % milliseconds_per_loop ) / float(milliseconds_per_loop) - 0.5f;
-	
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.ibo_cube_elements);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_STATIC_DRAW);
-
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.ibo_cube_elements);
-    // int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    // glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
-
 
     SDL_GL_SwapWindow(renderer.window);
 }

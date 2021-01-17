@@ -93,8 +93,8 @@ public:
 
         if( right_mouse_depressed){
 
-            Yaw   -= xoffset;
-            Pitch -= yoffset;
+            Yaw   += xoffset;
+            Pitch += yoffset;
 
             // make sure that when pitch is out of bounds, screen doesn't get flipped
             if (constrainPitch)

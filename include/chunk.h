@@ -8,52 +8,11 @@
 
 #include "view.h"
 #include "camera.h"
+#include "block.h"
 
 class Chunk{
 public:
-    GLfloat vertices[10*6*3] = {
-        -0.5f, -0.5f, -0.5f, 
-         0.5f, -0.5f, -0.5f, 
-         0.5f,  0.5f, -0.5f, 
-         0.5f,  0.5f, -0.5f, 
-        -0.5f,  0.5f, -0.5f, 
-        -0.5f, -0.5f, -0.5f, 
-
-        -0.5f, -0.5f,  0.5f,  
-         0.5f, -0.5f,  0.5f, 
-         0.5f,  0.5f,  0.5f,  
-         0.5f,  0.5f,  0.5f,  
-        -0.5f,  0.5f,  0.5f, 
-        -0.5f, -0.5f,  0.5f, 
-
-        -0.5f,  0.5f,  0.5f, 
-        -0.5f,  0.5f, -0.5f, 
-        -0.5f, -0.5f, -0.5f, 
-        -0.5f, -0.5f, -0.5f, 
-        -0.5f, -0.5f,  0.5f,  
-        -0.5f,  0.5f,  0.5f,  
-
-         0.5f,  0.5f,  0.5f,  
-         0.5f,  0.5f, -0.5f,  
-         0.5f, -0.5f, -0.5f,  
-         0.5f, -0.5f, -0.5f,  
-         0.5f, -0.5f,  0.5f, 
-         0.5f,  0.5f,  0.5f,  
-
-        -0.5f, -0.5f, -0.5f,  
-         0.5f, -0.5f, -0.5f,  
-         0.5f, -0.5f,  0.5f,  
-         0.5f, -0.5f,  0.5f,  
-        -0.5f, -0.5f,  0.5f,  
-        -0.5f, -0.5f, -0.5f,  
-
-        -0.5f,  0.5f, -0.5f,  
-         0.5f,  0.5f, -0.5f, 
-         0.5f,  0.5f,  0.5f,  
-         0.5f,  0.5f,  0.5f,  
-        -0.5f,  0.5f,  0.5f,  
-        -0.5f,  0.5f, -0.5f
-    };
+    
 
     // world space positions of our cubes
     glm::vec3 cubePositions[10] = {
@@ -72,7 +31,7 @@ public:
 
     bool background_is_black = true;
 
-    void renderChunk(My_renderer &renderer, Camera &camera);
+    void renderChunk(Renderer &renderer, Camera &camera);
 
 };
 
