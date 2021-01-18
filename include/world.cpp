@@ -1,13 +1,19 @@
 #include "world.h"
 
 
-void World::initWorld(){
-    Chunk test_chunk;
-    worldChunks[0] = test_chunk;
+World::World(){
+    
+
+    for (int i = 0; i < 16; i++)
+    {
+        worldChunks[i].setChunkCoords(i%4,0,i/4);
+    }
+    
 }
 
 void World::render(Renderer &renderer, Camera &camera){
-    
-
-    worldChunks[0].renderChunk(renderer, camera);
+    for (int i = 0; i < 1; i++)
+    {
+        worldChunks[i].renderChunk(renderer, camera);
+    }
 }

@@ -7,8 +7,9 @@
 
 class World{
 public:
-    Chunk worldChunks[10];
-    void initWorld();
+    Chunk worldChunks[16];
+    
+    World();
     void render(Renderer &renderer, Camera &camera);
     
 };

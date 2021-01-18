@@ -28,18 +28,29 @@ int main()
     renderer.initRender();
 
     World world;
-    world.initWorld();
 
     EventHandler events;
     SDL_Event evenHolder;
 
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
+    int lastTime = SDL_GetTicks();
+    int currentTime;
+    int numFrames = 0;
+
     loop = [&]
     {
 		events.update(&evenHolder, camera);
 
         world.render(renderer, camera);
+
+        currentTime = SDL_GetTicks();
+        numFrames++;
+        if(currentTime - lastTime >= 1000){
+            std::cout << (float) numFrames * 1000.0f / (float) (currentTime - lastTime) << std::endl;
+            numFrames = 0;
+            lastTime = currentTime;
+        }
     };
 
     // https://lyceum-allotments.github.io/2016/06/emscripten-and-sdl2-tutorial-part-5-move-owl/

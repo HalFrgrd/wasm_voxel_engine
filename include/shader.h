@@ -30,6 +30,8 @@ public:
     GLint getUniformLocation(const GLchar *uniform);
 
     void setMat4(const GLchar *name, const glm::mat4 &mat);
+    void setVec3(const GLchar *name, const glm::vec3 &vec);
+
     
 
 private:
