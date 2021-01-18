@@ -20,5 +20,9 @@ Can we use this significant overlap? i.e. striding one?
 
 
 ## Installing
-1. Install emcc
-2. Change the cmake compiler
+1. Install emsdk.
+2. In CMakeLists.txt, change the path to your emcc compiler.
+3. Create a folder called `build`.
+4. Cd into the `build` folder.
+5. Run `emcmake cmake ..` .
+6. Run `emmake make VERBOSE=1`.
