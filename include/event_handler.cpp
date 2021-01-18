@@ -18,6 +18,12 @@ void EventHandler::update(SDL_Event *e, Camera &camera){
                 case SDLK_d:
                     camera.ProcessKeyboard(RIGHT, 0.05f);
                     break;
+                case SDLK_LSHIFT:
+                    camera.ProcessKeyboard(DOWNWARD, 0.05f);
+                    break;
+                case SDLK_SPACE:
+                    camera.ProcessKeyboard(UPWARD, 0.05f);
+                    break;
             }
         }
         else if(e->type == SDL_MOUSEMOTION){

@@ -7,5 +7,7 @@ void World::initWorld(){
 }
 
 void World::render(Renderer &renderer, Camera &camera){
+    
+
     worldChunks[0].renderChunk(renderer, camera);
 }
