@@ -16,6 +16,7 @@ void Renderer::initRender(){
 
     
     // glGenVertexArraysOES(1, &vao);
+    glGenBuffers(1, &colours);
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -29,5 +30,9 @@ void Renderer::initRender(){
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+    glBindBuffer(GL_ARRAY_BUFFER, colours);
+    GLint colourAttrib = my_shader.getAttribLocation("vertex_colour");
+    glEnableVertexAttribArray(colourAttrib);
+    glVertexAttribPointer(colourAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
 }

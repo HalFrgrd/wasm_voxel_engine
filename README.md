@@ -27,3 +27,5 @@ Can we use this significant overlap? i.e. striding one?
 5. Run `emcmake cmake ..` .
 6. Run `emmake make VERBOSE=1`.
 7. You need to host a web server from the root dir. Easily done with python `python -m http.server 8080`.
+
+If you edit the shaders, make won't detect changes, so make sure you edit a cpp file also.

@@ -13,6 +13,26 @@ namespace Block{
         BLOCK_STONE
     };
 
+    inline glm::vec3 blockColour(BlockType block){
+        switch (block)
+        {
+        case BLOCK_DIRT:
+            return glm::vec3(0.8f,0.5f,0.0f);
+            break;
+        case BLOCK_STONE:
+            return glm::vec3(0.3f,0.3f,0.3f);
+            break;
+        
+        default:
+            return glm::vec3(0.1f,0.1f,0.1f);
+            break;
+        }
+    }
+
+    inline bool isSolid(BlockType block){
+        return block != BLOCK_AIR;
+    }
+
     const GLfloat vertices[10*6*3] = {
         -0.5f, -0.5f, -0.5f, 
          0.5f, -0.5f, -0.5f, 

@@ -20,7 +20,7 @@ public:
 
 
     SDL_Window *window;
-    GLuint vbo, vao;
+    GLuint vbo, vao, colours;
     Shader my_shader;
 
 
