@@ -14,6 +14,9 @@ void Renderer::initRender(){
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+    glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LEQUAL);
+
     
     // glGenVertexArraysOES(1, &vao);
     glGenBuffers(1, &colours);

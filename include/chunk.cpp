@@ -236,8 +236,7 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_FRONT_AND_BACK);
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    
 
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer.colours);

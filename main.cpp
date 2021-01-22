@@ -30,7 +30,7 @@ int main()
     World world;
 
     EventHandler events;
-    SDL_Event evenHolder;
+    SDL_Event eventHolder;
 
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -40,7 +40,8 @@ int main()
 
     loop = [&]
     {
-		events.update(&evenHolder, camera);
+        events.process(&eventHolder, camera);
+		events.update(camera);
 
         world.render(renderer, camera);
 

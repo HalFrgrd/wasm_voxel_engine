@@ -1,28 +1,49 @@
 #include "event_handler.h"
 
-void EventHandler::update(SDL_Event *e, Camera &camera){
+void EventHandler::process(SDL_Event *e, Camera &camera){
 
 
     while(SDL_PollEvent(e) != 0){
         if(e->type == SDL_KEYDOWN){
             switch(e->key.keysym.sym){
                 case SDLK_w:
-                    camera.ProcessKeyboard(FORWARD, 0.05f);
+                    w_depressed = true;
                     break;
                 case SDLK_a:
-                    camera.ProcessKeyboard(LEFT, 0.05f);
+                    a_depressed = true;
                     break;
                 case SDLK_s:
-                    camera.ProcessKeyboard(BACKWARD, 0.05f);
+                    s_depressed = true;
                     break;
                 case SDLK_d:
-                    camera.ProcessKeyboard(RIGHT, 0.05f);
+                    d_depressed = true;
                     break;
                 case SDLK_LSHIFT:
-                    camera.ProcessKeyboard(DOWNWARD, 0.05f);
+                    shift_depressed = true;
                     break;
                 case SDLK_SPACE:
-                    camera.ProcessKeyboard(UPWARD, 0.05f);
+                    space_depressed = true;
+                    break;
+            }
+        } else if(e->type == SDL_KEYUP){
+            switch(e->key.keysym.sym){
+                case SDLK_w:
+                    w_depressed = false;
+                    break;
+                case SDLK_a:
+                    a_depressed = false;
+                    break;
+                case SDLK_s:
+                    s_depressed = false;
+                    break;
+                case SDLK_d:
+                    d_depressed = false;
+                    break;
+                case SDLK_LSHIFT:
+                    shift_depressed = false;
+                    break;
+                case SDLK_SPACE:
+                    space_depressed = false;
                     break;
             }
         }
@@ -45,4 +66,16 @@ void EventHandler::update(SDL_Event *e, Camera &camera){
             right_click_depressed = false;
         }
     }
+}
+
+
+void EventHandler::update(Camera &camera){
+    if(w_depressed)  camera.ProcessKeyboard(FORWARD, 0.05f);
+    if(a_depressed)  camera.ProcessKeyboard(LEFT, 0.05f);
+    if(s_depressed)  camera.ProcessKeyboard(BACKWARD, 0.05f);
+    if(d_depressed)  camera.ProcessKeyboard(RIGHT, 0.05f);
+    if(shift_depressed)  camera.ProcessKeyboard(DOWNWARD, 0.05f);
+    if(space_depressed)  camera.ProcessKeyboard(UPWARD, 0.05f);
+   
+
 }
