@@ -29,3 +29,7 @@ Can we use this significant overlap? i.e. striding one?
 7. You need to host a web server from the root dir. Easily done with python `python -m http.server 8080`.
 
 If you edit the shaders, make won't detect changes, so make sure you edit a cpp file also.
+
+
+## Notes
+emcc -I./include main.cpp include/view.cpp include/chunk.cpp include/shader.cpp include/event_handler.cpp include/camera.cpp include/world.cpp -std=c++11 -s WASM=1 -s USE_SDL=2 -O1 -s LLD_REPORT_UNDEFINED --preload-file include/shaders -o index.js

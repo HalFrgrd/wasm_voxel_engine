@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16.3)
 
 # use emcc instead of your default cpp compiler
-set(CMAKE_CXX_COMPILER "/home/hal/emsdk/upstream/emscripten/emcc")
+set(CMAKE_CXX_COMPILER "emcc")
 
 #project name
 project(wasm_voxel_engine)
