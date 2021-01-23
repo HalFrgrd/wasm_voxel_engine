@@ -71,6 +71,8 @@ bool Chunk::compareStep(glm::vec3 a, glm::vec3 b, int direction, bool isBackFace
 void Chunk::renderChunk(Renderer &renderer, Camera &camera){
 
 
+    // https://eddieabbondanz.io/post/voxel/greedy-mesh/
+
     // glBindVertexArray(renderer.vao);
     glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize,chunkZ * chunkSize );
     mesh.vertices.clear();
