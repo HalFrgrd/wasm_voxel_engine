@@ -2,6 +2,7 @@
 
 #define GL_GLEXT_PROTOTYPES 1
 
+#include <iostream>
 #include "view.h"
 
 

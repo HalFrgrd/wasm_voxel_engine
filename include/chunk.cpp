@@ -14,14 +14,32 @@ glm::vec3 Chunk::unflattenCoords(int i){
     return glm::vec3(i% (chunkSize), (i/chunkSize)%chunkSize, (i/(chunkSize*chunkSize))%chunkSize  );
 }
 
-Block::BlockType Chunk::getBlock(glm::vec3 coords){
+Block::BlockType Chunk::getBlockFromChunk(glm::vec3 coords){
+
+    assert(coords.x >=0 && coords.x < chunkSize &&
+        coords.y >=0 && coords.y < chunkSize &&
+        coords.z >=0 && coords.z < chunkSize);
+    int blockCoord = flattenCoords(coords);
+    assert(blockCoord < chunkSize*chunkSize*chunkSize);
+    return cubePositions[blockCoord]; 
+}
+
+
+
+Block::BlockType Chunk::getBlockFromWorld(glm::vec3 coords){
+    // std::cout << coords.x << " " << coords.x << " " << coords.x << std::endl;
+    // assert(1+1==3);
     if(coords.x >=0 && coords.x < chunkSize &&
         coords.y >=0 && coords.y < chunkSize &&
         coords.z >=0 && coords.z < chunkSize )
         {
-            return cubePositions[flattenCoords(coords)];
+            return getBlockFromChunk(coords);
         }
-    return Block::BLOCK_AIR;
+
+    assert(my_world.test == 3);
+    // assert(0==1);
+    
+    return my_world.worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
 };
 
 
@@ -32,7 +50,9 @@ void Chunk::setChunkCoords(int x, int y, int z){
 
 }
 
-Chunk::Chunk(){
+Chunk::Chunk(World &initWorld) : my_world (initWorld) {
+
+    
 
     for(int k = 0; k < chunkSize; k++){
         for(int i = 0; i < chunkSize; i++){
@@ -57,12 +77,12 @@ Chunk::Chunk(){
 bool Chunk::isBlockFaceVisible(glm::vec3 blockPos, int axis, bool isBackFace){
     glm::vec3 temp = blockPos;
     temp[axis] += isBackFace ? -1 : 1;
-    return !Block::isSolid(getBlock(temp));
+    return !Block::isSolid(getBlockFromWorld(temp));
 }
 
 bool Chunk::compareStep(glm::vec3 a, glm::vec3 b, int direction, bool isBackFace){
-    Block::BlockType blockA = getBlock(a);
-    Block::BlockType blockB = getBlock(b);
+    Block::BlockType blockA = getBlockFromWorld(a);
+    Block::BlockType blockB = getBlockFromWorld(b);
 
     return blockA == blockB && Block::isSolid(blockA) && isBlockFaceVisible(b, direction, isBackFace);
 }
@@ -80,9 +100,9 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
 
     glm::ivec3 quadSize;
 
-    glm::vec3 m; 
-    glm::vec3 n;
-    glm::vec3 offsetPos;
+    glm::vec4 m; 
+    glm::vec4 n;
+    glm::vec4 offsetPos;
 
     glm::ivec3 startPos;
     glm::ivec3 currPos;
@@ -133,7 +153,9 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
 
             for (startPos[workAxis1] = 0; startPos[workAxis1] < chunkSize; startPos[workAxis1]++) {
                 for (startPos[workAxis2] = 0; startPos[workAxis2] < chunkSize; startPos[workAxis2]++) {
-                    startBlock = getBlock(startPos);
+                    
+
+                    startBlock = getBlockFromChunk(startPos);
 
                     // If this face is already merged or the block is not solid or the face is not visible
                     if(
@@ -142,6 +164,8 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
                         !isBlockFaceVisible(startPos,direction,isBackFace)){
                             continue;
                         }
+                            
+
                     
                     quadSize = glm::ivec3(0);
 
@@ -165,34 +189,25 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
                     
                     quadSize[workAxis1] = currPos[workAxis1] - startPos[workAxis1];
 
-                    m = glm::vec3(0.0f);
+                    m = glm::vec4(0.0f);
                     m[workAxis1] = (float) quadSize[workAxis1];
 
-                    n = glm::vec3(0.0f);
+                    n = glm::vec4(0.0f);
                     n[workAxis2] = (float) quadSize[workAxis2];
 
-                    offsetPos = glm::vec3((float)startPos.x,(float)startPos.y,(float)startPos.z);
+                    offsetPos = glm::vec4(startPos.x,startPos.y,startPos.z,1.0f);
                     offsetPos[direction] += isBackFace ? 0.0f : 1.0f;
 
+                    glm::vec4 quads[4];
+
                     glm::mat4 model = glm::mat4(1.0f); 
-                    // model = glm::translate(model, unflattenCoords(i));
+                    // glm::mat3 model = glm::mat3(1.0f); 
                     model = glm::translate(model, chunkShift);
 
-                    glm::vec3 quads[4];
-
-                    // quads[0] = model * glm::vec4(0.5,0.5,0.5,1.0);
-                    // quads[1] = model * glm::vec4(-0.5,0.5,0.5,1.0);
-                    // quads[2] = model * glm::vec4(0.5,-0.5,0.5,1.0);
-                    // quads[3] = model * glm::vec4(-0.5,-0.5,0.5,1.0);
-
-
-
-                    glm::vec3 farCorner = glm::vec3(m.x+n.x, m.y + n.y, m.z +n.z);
-
-                    quads[0] = offsetPos ;
-                    quads[1] = offsetPos+m;
-                    quads[2] = offsetPos+farCorner;
-                    quads[3] = offsetPos+n;
+                    quads[0] = model * offsetPos ;
+                    quads[1] = model *offsetPos+m;
+                    quads[2] = model *offsetPos+m+n;
+                    quads[3] = model *offsetPos+n;
 
                     // glm::vec3 quadColour = Block::blockColour(startBlock);
         
@@ -256,7 +271,7 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
 
 }
 
-void ChunkMesh::addVertex(glm::vec3 vertex, glm::vec3 colour){
+void ChunkMesh::addVertex(glm::vec4 vertex, glm::vec3 colour){
     vertices.push_back(vertex.x);
     vertices.push_back(vertex.y);
     vertices.push_back(vertex.z);
@@ -266,7 +281,7 @@ void ChunkMesh::addVertex(glm::vec3 vertex, glm::vec3 colour){
     colours.push_back(colour.z);
 }
 
-void ChunkMesh::addQuad(glm::vec3 quadVertices[],glm::vec3 colour, bool isBackFace ){
+void ChunkMesh::addQuad(glm::vec4 quadVertices[],glm::vec3 colour, bool isBackFace ){
     // if (sizeof(quadVertices)/sizeof(quadVertices[0]) != 4){
     //     std::cout << "Length of vertices" << sizeof(quadVertices)/sizeof(quadVertices[0]) << std::endl; 
     //     throw "Given quad with not 4 vertices";

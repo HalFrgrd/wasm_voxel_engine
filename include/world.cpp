@@ -1,14 +1,40 @@
 #include "world.h"
+#include "chunk.h"
+
+World::World(): worldChunks (16) {
 
 
-World::World(){
-    
 
     for (int i = 0; i < 16; i++)
     {
-        worldChunks[i].setChunkCoords(i%4,0,i/4);
+        worldChunks[i]->setChunkCoords(i%4,0,i/4);
+        worldChunks[i]->my_world = *this;
     }
-    
+}
+
+
+glm::ivec3 getChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
+        
+    return glm::ivec3(blockX/Chunk::chunkSize,blockY/Chunk::chunkSize,blockZ/Chunk::chunkSize);
+}
+
+glm::ivec3 getInternalChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
+    return glm::ivec3(blockX%Chunk::chunkSize,blockY%Chunk::chunkSize,blockZ%Chunk::chunkSize);
+}
+
+Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int blockZ){
+    std::cout << blockX << " " << blockY << " " << blockZ << std::endl;
+    assert(0==1);
+
+    glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
+
+    if (0<= chunkCoords.x  && chunkCoords.x < 4 &&
+        0 == chunkCoords.y &&
+        0<= chunkCoords.z && chunkCoords.z < 4 ){
+            assert(0<= chunkCoords.x + 4* chunkCoords.z && chunkCoords.x + 4* chunkCoords.z < 16);
+            return worldChunks[chunkCoords.x + 4* chunkCoords.z]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
+        }
+    return Block::BLOCK_AIR;
 }
 
 void World::render(Renderer &renderer, Camera &camera){
@@ -27,9 +53,10 @@ void World::render(Renderer &renderer, Camera &camera){
 
 
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 2; i++)
     {
-        worldChunks[i].renderChunk(renderer, camera);
+
+        worldChunks[i]->renderChunk(renderer, camera);
     }
 
     SDL_GL_SwapWindow(renderer.window);

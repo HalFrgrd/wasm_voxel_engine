@@ -9,6 +9,8 @@
 #include "view.h"
 #include "camera.h"
 #include "block.h"
+#include "world.h"
+
 
 class ChunkMesh{
 public:
@@ -16,17 +18,18 @@ public:
     std::vector<GLfloat> vertices;
     std::vector<GLfloat> colours;
 
-    void addQuad(glm::vec3 quadVertices[], glm::vec3 colour, bool isBackFace );
-    void addVertex(glm::vec3 vertex, glm::vec3 colour);
+    void addQuad(glm::vec4 quadVertices[], glm::vec3 colour, bool isBackFace );
+    void addVertex(glm::vec4 vertex, glm::vec3 colour);
 
 };
 
 class Chunk{
 public:
 
-    Chunk();
+    Chunk(World& world);
     
 	void setChunkCoords(int x, int y, int z);
+    World &my_world;
     int chunkX;
     int chunkY;
     int chunkZ;
@@ -40,7 +43,8 @@ public:
     int flattenCoords(glm::vec3 coords);
 	int flattenCoords(int i, int j, int k);
 	glm::vec3 unflattenCoords(int i);
-    Block::BlockType getBlock(glm::vec3 coords);
+    Block::BlockType getBlockFromWorld(glm::vec3 coords);
+    Block::BlockType getBlockFromChunk(glm::vec3 coords);
 
     void renderChunk(Renderer &renderer, Camera &camera);
 
