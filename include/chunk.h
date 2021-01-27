@@ -26,7 +26,7 @@ public:
 class Chunk{
 public:
 
-    Chunk(World& world);
+    Chunk(World& initWorld);
     
 	void setChunkCoords(int x, int y, int z);
     World &my_world;

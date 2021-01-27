@@ -50,7 +50,7 @@ void Chunk::setChunkCoords(int x, int y, int z){
 
 }
 
-Chunk::Chunk(World &initWorld) : my_world (initWorld) {
+Chunk::Chunk(World& initWorld): my_world(initWorld) {
 
     
 
