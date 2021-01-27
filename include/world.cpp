@@ -5,10 +5,10 @@ World::World() {
 
     for (int i = 0; i < 1; i++)
     {
-        Chunk load_chunk = Chunk();
-        worldChunks.push_back( &load_chunk);
+        Chunk* new_chunk = new Chunk();
+        worldChunks.push_back(new_chunk);
         worldChunks[i]->setChunkCoords(i%4,0,i/4);
-        worldChunks[i]->my_world = this;
+        // worldChunks[i]->my_world = this;
     }
 }
 
@@ -51,8 +51,8 @@ void World::render(Renderer &renderer, Camera &camera){
 
 
     for (int i = 0; i < 1; i++)
-    { 
-        worldChunks[i]->renderChunk(renderer, camera,  i%4, 0, i/4);
+    {
+        worldChunks[i]->renderChunk(renderer, camera);
     }
 
     SDL_GL_SwapWindow(renderer.window);

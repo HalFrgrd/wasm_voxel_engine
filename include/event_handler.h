@@ -10,7 +10,7 @@ public:
     void update(Camera &camera);
     int prev_x;
     int prev_y;
-    bool right_click_depressed  = false;
+    bool right_click_depressed = false;
 
     bool w_depressed = false;
     bool a_depressed = false;
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif
+#endif 

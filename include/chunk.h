@@ -11,7 +11,6 @@
 #include "block.h"
 #include "world.h"
 
-
 class ChunkMesh{
 public:
     
@@ -37,6 +36,7 @@ public:
     int chunkZ;
 
     ChunkMesh mesh;
+    World *my_world;
 
 	static const int chunkSize = 8;
 

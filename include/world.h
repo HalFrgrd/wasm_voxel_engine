@@ -8,11 +8,11 @@
 
 class Chunk;
 
+class Chunk;
+
 class World{
 public:
     std::vector<Chunk*> worldChunks;
-
-    int test = 3;
     
     World();
     void render(Renderer &renderer, Camera &camera);
