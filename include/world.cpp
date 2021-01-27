@@ -1,4 +1,5 @@
 #include "world.h"
+#include "chunk.h"
 
 
 World::World(){
@@ -6,7 +7,10 @@ World::World(){
 
     for (int i = 0; i < 16; i++)
     {
-        worldChunks[i].setChunkCoords(i%4,0,i/4);
+        Chunk* new_chunk = new Chunk();
+        worldChunks.push_back(new_chunk);
+        worldChunks[i]->setChunkCoords(i%4,0,i/4);
+        // worldChunks[i]->my_world = this;
     }
     
 }
@@ -29,7 +33,7 @@ void World::render(Renderer &renderer, Camera &camera){
 
     for (int i = 0; i < 1; i++)
     {
-        worldChunks[i].renderChunk(renderer, camera);
+        worldChunks[i]->renderChunk(renderer, camera);
     }
 
     SDL_GL_SwapWindow(renderer.window);

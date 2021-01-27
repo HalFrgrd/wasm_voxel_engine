@@ -1,13 +1,15 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "chunk.h"
+// #include "chunk.h"
 #include "view.h"
 #include "camera.h"
 
+class Chunk;
+
 class World{
 public:
-    Chunk worldChunks[16];
+    std::vector<Chunk*> worldChunks;
     
     World();
     void render(Renderer &renderer, Camera &camera);
