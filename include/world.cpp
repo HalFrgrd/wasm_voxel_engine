@@ -3,13 +3,15 @@
 
 World::World() {
 
-    for (int i = 0; i < 16; i++)
-    {
-        Chunk* new_chunk = new Chunk();
-        worldChunks.push_back(new_chunk);
-        worldChunks[i]->setChunkCoords(i%4,0,i/4);
-        worldChunks[i]->my_world = this;
+
+    for(int x = 0; x< 5; x ++){
+        for(int z = 0; z<5; z++){
+            Chunk* new_chunk = new Chunk(this,x,0,z, &terrain);
+            worldChunks.push_back(new_chunk);
+        }
     }
+  
+    
 }
 
 
@@ -25,10 +27,10 @@ glm::ivec3 getInternalChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
 Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int blockZ){
     glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
 
-    if (0<= chunkCoords.x  && chunkCoords.x < 4 &&
+    if (0<= chunkCoords.x  && chunkCoords.x < 5 &&
         0 == chunkCoords.y &&
-        0<= chunkCoords.z && chunkCoords.z < 4 ){
-            return worldChunks[chunkCoords.x + 4* chunkCoords.z]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
+        0<= chunkCoords.z && chunkCoords.z < 5 ){
+            return worldChunks[chunkCoords.x + 5* chunkCoords.z]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
         }
     return Block::BLOCK_AIR;
 }
@@ -49,7 +51,7 @@ void World::render(Renderer &renderer, Camera &camera){
 
 
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < worldChunks.size(); i++)
     {
         worldChunks[i]->renderChunk(renderer, camera);
     }

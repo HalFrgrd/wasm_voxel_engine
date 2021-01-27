@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "block.h"
 #include "world.h"
+#include "terrain.h"
 
 class ChunkMesh{
 public:
@@ -25,8 +26,7 @@ public:
 class Chunk{
 public:
 
-    Chunk();
-    // Chunk(World& initWorld);
+    Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain);
     
 	void setChunkCoords(int x, int y, int z);
     World *my_world;
@@ -36,17 +36,20 @@ public:
     int chunkZ;
 
     ChunkMesh mesh;
+    bool lastMeshStillValid = false;
 
-	static const int chunkSize = 8;
+	static const int chunkSize = 32;
 
     Block::BlockType cubePositions[chunkSize*chunkSize*chunkSize];
 
     int flattenCoords(glm::ivec3 coords);
 	int flattenCoords(int i, int j, int k);
+    glm::ivec3 localPosToGlobalPos(int x, int y, int z);
 	glm::ivec3 unflattenCoords(int i);
     Block::BlockType getBlockFromWorld(glm::ivec3 coords);
     Block::BlockType getBlockFromChunk(glm::ivec3 coords);
 
+    void generateGreedyMesh();
     void renderChunk(Renderer &renderer, Camera &camera);
 
     bool isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace);

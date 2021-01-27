@@ -5,6 +5,7 @@
 #include "view.h"
 #include "camera.h"
 #include "block.h"
+#include "terrain.h"
 
 class Chunk;
 
@@ -13,6 +14,7 @@ class Chunk;
 class World{
 public:
     std::vector<Chunk*> worldChunks;
+    TerrainGenerator terrain;
     
     World();
     void render(Renderer &renderer, Camera &camera);
