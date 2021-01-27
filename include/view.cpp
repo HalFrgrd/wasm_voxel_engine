@@ -17,6 +17,10 @@ void Renderer::initRender(){
 
     glEnable(GL_DEPTH_TEST);
     // glDepthFunc(GL_LEQUAL);
+      // glFrontFace(GL_CCW);
+
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT_AND_BACK);
 
     
     // glGenVertexArraysOES(1, &vao);

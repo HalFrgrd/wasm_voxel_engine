@@ -6,10 +6,10 @@
 
 
 namespace Block{
-    enum BlockType {
-        BLOCK_AIR,
-        BLOCK_DIRT,
-        BLOCK_GRASS,
+    enum BlockType: int {
+        BLOCK_AIR = 0,
+        BLOCK_DIRT ,
+        BLOCK_GRASS ,
         BLOCK_STONE
     };
 

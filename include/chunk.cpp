@@ -2,33 +2,35 @@
 
 
 int Chunk::flattenCoords(int i, int j, int k){
+    int val = i + chunkSize*j + chunkSize*chunkSize*k;
+    // if(val < 0 || val >= chunkSize*chunkSize*chunkSize){
+    //     std::cout<<val<<i<<j<<k<<std::endl;
+    // }
     return i + chunkSize*j + chunkSize*chunkSize*k;
 }
 
-int Chunk::flattenCoords(glm::vec3 coords){
+int Chunk::flattenCoords(glm::ivec3 coords){
     return flattenCoords(coords.x,coords.y,coords.z);
 };
 
 
-glm::vec3 Chunk::unflattenCoords(int i){
-    return glm::vec3(i% (chunkSize), (i/chunkSize)%chunkSize, (i/(chunkSize*chunkSize))%chunkSize  );
+glm::ivec3 Chunk::unflattenCoords(int i){
+    return glm::ivec3(i% (chunkSize), (i/chunkSize)%chunkSize, (i/(chunkSize*chunkSize))%chunkSize  );
 }
 
-Block::BlockType Chunk::getBlockFromChunk(glm::vec3 coords){
-
-    assert(coords.x >=0 && coords.x < chunkSize &&
-        coords.y >=0 && coords.y < chunkSize &&
-        coords.z >=0 && coords.z < chunkSize);
-    int blockCoord = flattenCoords(coords);
-    assert(blockCoord < chunkSize*chunkSize*chunkSize);
-    return cubePositions[blockCoord]; 
+Block::BlockType Chunk::getBlockFromChunk(glm::ivec3 coords){
+    Block::BlockType return_block = cubePositions[flattenCoords(coords)];
+    if(return_block != 0 || return_block != 3){
+        std::cout<< return_block <<std::endl;
+        std::cout<<coords.x<<" "<<coords.y<<" "<<coords.z<<std::endl;
+    }
+    return return_block; 
 }
 
 
 
-Block::BlockType Chunk::getBlockFromWorld(glm::vec3 coords){
-    // std::cout << coords.x << " " << coords.x << " " << coords.x << std::endl;
-    // assert(1+1==3);
+Block::BlockType Chunk::getBlockFromWorld(glm::ivec3 coords){
+
     if(coords.x >=0 && coords.x < chunkSize &&
         coords.y >=0 && coords.y < chunkSize &&
         coords.z >=0 && coords.z < chunkSize )
@@ -36,10 +38,9 @@ Block::BlockType Chunk::getBlockFromWorld(glm::vec3 coords){
             return getBlockFromChunk(coords);
         }
 
-    assert(my_world.test == 3);
-    // assert(0==1);
-    
-    return my_world.worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
+
+    return Block::BLOCK_AIR;
+    // return my_world->worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
 };
 
 
@@ -50,37 +51,47 @@ void Chunk::setChunkCoords(int x, int y, int z){
 
 }
 
-Chunk::Chunk(World& initWorld): my_world(initWorld) {
-
-    
+// Chunk::Chunk(World& initWorld): my_world(initWorld) {
+Chunk::Chunk() {
 
     for(int k = 0; k < chunkSize; k++){
         for(int i = 0; i < chunkSize; i++){
             for(int j = 0; j < chunkSize; j++){
-                int heightThreshold = 4+ (rand()%4);
-                if(j > heightThreshold){
-                    cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
-                } else{
-                    if(rand()%5 == 1){
-                        cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
-                    }else{
-                        cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
-                    }
-                }
+                // int heightThreshold = 4+ (rand()%4);
+                // if(j > heightThreshold){
+                //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
+                // } else{
+                cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
+
+                    // if(rand()%5 == 1){
+                    //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
+                    // }else{
+                    //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
+                    // }
+                // }
             }
         }
     }
 
+    // for(int m = 0; m < chunkSize*chunkSize*chunkSize; m++){
+    //     std::cout<<cubePositions[m]<<std::endl;
+    // }
+
 
 }
 
-bool Chunk::isBlockFaceVisible(glm::vec3 blockPos, int axis, bool isBackFace){
-    glm::vec3 temp = blockPos;
-    temp[axis] += isBackFace ? -1 : 1;
+bool Chunk::isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace){
+    glm::ivec3 temp = blockPos;
+    if(isBackFace){
+        temp[axis] -=1;
+    } else{
+        temp[axis] += 1;
+    }
+
     return !Block::isSolid(getBlockFromWorld(temp));
 }
 
-bool Chunk::compareStep(glm::vec3 a, glm::vec3 b, int direction, bool isBackFace){
+bool Chunk::compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFace){
     Block::BlockType blockA = getBlockFromWorld(a);
     Block::BlockType blockB = getBlockFromWorld(b);
 
@@ -88,13 +99,14 @@ bool Chunk::compareStep(glm::vec3 a, glm::vec3 b, int direction, bool isBackFace
 }
 
 
-void Chunk::renderChunk(Renderer &renderer, Camera &camera){
+void Chunk::renderChunk(Renderer &renderer, Camera &camera, int a, int b, int c){
 
 
     // https://eddieabbondanz.io/post/voxel/greedy-mesh/
 
     // glBindVertexArray(renderer.vao);
-    glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize,chunkZ * chunkSize );
+    glm::vec3 chunkShift = glm::vec3((float ) a *(float ) chunkSize,(float ) b *(float ) chunkSize,(float )c *(float ) chunkSize );
+    // glm::vec3 chunkShift = glm::vec3(0.0f);
     mesh.vertices.clear();
     mesh.colours.clear();
 
@@ -155,7 +167,7 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
                 for (startPos[workAxis2] = 0; startPos[workAxis2] < chunkSize; startPos[workAxis2]++) {
                     
 
-                    startBlock = getBlockFromChunk(startPos);
+                    startBlock = getBlockFromWorld(startPos);
 
                     // If this face is already merged or the block is not solid or the face is not visible
                     if(
@@ -201,7 +213,6 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
                     glm::vec4 quads[4];
 
                     glm::mat4 model = glm::mat4(1.0f); 
-                    // glm::mat3 model = glm::mat3(1.0f); 
                     model = glm::translate(model, chunkShift);
 
                     quads[0] = model * offsetPos ;
@@ -248,11 +259,6 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
     // }
 
 
-    // glFrontFace(GL_CCW);
-
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_FRONT_AND_BACK);
-
     
 
 
@@ -263,6 +269,8 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
     glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size()*sizeof(float), &mesh.vertices[0], GL_STATIC_DRAW);
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.9,0.5,0.1));
+
+    // std::cout<<mesh.vertices.size()<<std::endl;
 
     glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size());
     
@@ -282,10 +290,6 @@ void ChunkMesh::addVertex(glm::vec4 vertex, glm::vec3 colour){
 }
 
 void ChunkMesh::addQuad(glm::vec4 quadVertices[],glm::vec3 colour, bool isBackFace ){
-    // if (sizeof(quadVertices)/sizeof(quadVertices[0]) != 4){
-    //     std::cout << "Length of vertices" << sizeof(quadVertices)/sizeof(quadVertices[0]) << std::endl; 
-    //     throw "Given quad with not 4 vertices";
-    // }
 
     if (!isBackFace) {
         addVertex(quadVertices[0], colour);

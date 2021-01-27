@@ -1,14 +1,14 @@
 #include "world.h"
 #include "chunk.h"
 
-World::World(): worldChunks (16) {
+World::World() {
 
-
-
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 1; i++)
     {
+        Chunk load_chunk = Chunk();
+        worldChunks.push_back( &load_chunk);
         worldChunks[i]->setChunkCoords(i%4,0,i/4);
-        worldChunks[i]->my_world = *this;
+        worldChunks[i]->my_world = this;
     }
 }
 
@@ -23,9 +23,6 @@ glm::ivec3 getInternalChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
 }
 
 Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int blockZ){
-    std::cout << blockX << " " << blockY << " " << blockZ << std::endl;
-    assert(0==1);
-
     glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
 
     if (0<= chunkCoords.x  && chunkCoords.x < 4 &&
@@ -53,10 +50,9 @@ void World::render(Renderer &renderer, Camera &camera){
 
 
 
-    for (int i = 0; i < 2; i++)
-    {
-
-        worldChunks[i]->renderChunk(renderer, camera);
+    for (int i = 0; i < 1; i++)
+    { 
+        worldChunks[i]->renderChunk(renderer, camera,  i%4, 0, i/4);
     }
 
     SDL_GL_SwapWindow(renderer.window);

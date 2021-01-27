@@ -26,10 +26,12 @@ public:
 class Chunk{
 public:
 
-    Chunk(World& initWorld);
+    Chunk();
+    // Chunk(World& initWorld);
     
 	void setChunkCoords(int x, int y, int z);
-    World &my_world;
+    World *my_world;
+
     int chunkX;
     int chunkY;
     int chunkZ;
@@ -40,16 +42,16 @@ public:
 
     Block::BlockType cubePositions[chunkSize*chunkSize*chunkSize];
 
-    int flattenCoords(glm::vec3 coords);
+    int flattenCoords(glm::ivec3 coords);
 	int flattenCoords(int i, int j, int k);
-	glm::vec3 unflattenCoords(int i);
-    Block::BlockType getBlockFromWorld(glm::vec3 coords);
-    Block::BlockType getBlockFromChunk(glm::vec3 coords);
+	glm::ivec3 unflattenCoords(int i);
+    Block::BlockType getBlockFromWorld(glm::ivec3 coords);
+    Block::BlockType getBlockFromChunk(glm::ivec3 coords);
 
-    void renderChunk(Renderer &renderer, Camera &camera);
+    void renderChunk(Renderer &renderer, Camera &camera, int a, int b, int c);
 
-    bool isBlockFaceVisible(glm::vec3 blockPos, int axis, bool isBackFace);
-    bool compareStep(glm::vec3 a, glm::vec3 b, int direction, bool isBackFace);
+    bool isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace);
+    bool compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFace);
 
 
 
