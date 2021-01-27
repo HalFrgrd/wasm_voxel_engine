@@ -3,12 +3,12 @@
 
 World::World() {
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 16; i++)
     {
         Chunk* new_chunk = new Chunk();
         worldChunks.push_back(new_chunk);
         worldChunks[i]->setChunkCoords(i%4,0,i/4);
-        // worldChunks[i]->my_world = this;
+        worldChunks[i]->my_world = this;
     }
 }
 
@@ -28,7 +28,6 @@ Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int block
     if (0<= chunkCoords.x  && chunkCoords.x < 4 &&
         0 == chunkCoords.y &&
         0<= chunkCoords.z && chunkCoords.z < 4 ){
-            assert(0<= chunkCoords.x + 4* chunkCoords.z && chunkCoords.x + 4* chunkCoords.z < 16);
             return worldChunks[chunkCoords.x + 4* chunkCoords.z]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
         }
     return Block::BLOCK_AIR;
@@ -50,7 +49,7 @@ void World::render(Renderer &renderer, Camera &camera){
 
 
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 3; i++)
     {
         worldChunks[i]->renderChunk(renderer, camera);
     }

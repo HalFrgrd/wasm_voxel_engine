@@ -36,7 +36,6 @@ public:
     int chunkZ;
 
     ChunkMesh mesh;
-    World *my_world;
 
 	static const int chunkSize = 8;
 
@@ -48,7 +47,7 @@ public:
     Block::BlockType getBlockFromWorld(glm::ivec3 coords);
     Block::BlockType getBlockFromChunk(glm::ivec3 coords);
 
-    void renderChunk(Renderer &renderer, Camera &camera, int a, int b, int c);
+    void renderChunk(Renderer &renderer, Camera &camera);
 
     bool isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace);
     bool compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFace);

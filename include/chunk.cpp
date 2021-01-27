@@ -20,10 +20,10 @@ glm::ivec3 Chunk::unflattenCoords(int i){
 
 Block::BlockType Chunk::getBlockFromChunk(glm::ivec3 coords){
     Block::BlockType return_block = cubePositions[flattenCoords(coords)];
-    if(return_block != 0 || return_block != 3){
-        std::cout<< return_block <<std::endl;
-        std::cout<<coords.x<<" "<<coords.y<<" "<<coords.z<<std::endl;
-    }
+    // if(return_block != 0 || return_block != 3){
+    //     std::cout<< return_block <<std::endl;
+    //     std::cout<<coords.x<<" "<<coords.y<<" "<<coords.z<<std::endl;
+    // }
     return return_block; 
 }
 
@@ -39,8 +39,8 @@ Block::BlockType Chunk::getBlockFromWorld(glm::ivec3 coords){
         }
 
 
-    return Block::BLOCK_AIR;
-    // return my_world->worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
+    // return Block::BLOCK_AIR;
+    return my_world->worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
 };
 
 
@@ -57,18 +57,16 @@ Chunk::Chunk() {
     for(int k = 0; k < chunkSize; k++){
         for(int i = 0; i < chunkSize; i++){
             for(int j = 0; j < chunkSize; j++){
-                // int heightThreshold = 4+ (rand()%4);
-                // if(j > heightThreshold){
-                //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
-                // } else{
-                cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
-
-                    // if(rand()%5 == 1){
-                    //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
-                    // }else{
-                    //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
-                    // }
-                // }
+                int heightThreshold = 4+ (rand()%4);
+                if(j > heightThreshold){
+                    cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
+                } else{
+                    if(rand()%5 == 1){
+                        cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
+                    }else{
+                        cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
+                    }
+                }
             }
         }
     }
@@ -99,13 +97,13 @@ bool Chunk::compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFa
 }
 
 
-void Chunk::renderChunk(Renderer &renderer, Camera &camera, int a, int b, int c){
+void Chunk::renderChunk(Renderer &renderer, Camera &camera){
 
 
     // https://eddieabbondanz.io/post/voxel/greedy-mesh/
 
     // glBindVertexArray(renderer.vao);
-    glm::vec3 chunkShift = glm::vec3((float ) a *(float ) chunkSize,(float ) b *(float ) chunkSize,(float )c *(float ) chunkSize );
+    glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize, chunkZ *chunkSize );
     // glm::vec3 chunkShift = glm::vec3(0.0f);
     mesh.vertices.clear();
     mesh.colours.clear();
