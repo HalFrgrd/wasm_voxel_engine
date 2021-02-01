@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 11)
 # specific flags for the emcc command
 # we need to embed (or preload) our assets
 set(CMAKE_CXX_FLAGS  
-    "-O1 -s WASM=1 -s USE_SDL=2 -s LLD_REPORT_UNDEFINED --embed-file ../include/shaders"
+    "-O1 -s WASM=1 -s USE_SDL=2 -s TOTAL_MEMORY=1024MB -s LLD_REPORT_UNDEFINED --embed-file ../include/shaders"
 )
 
 file(GLOB SOURCES "include/*.cpp")

@@ -23,7 +23,7 @@ public:
     Renderer *renderer;
     void render(Camera &camera);
 
-    const static int radius = 1;
+    const static int radius = 2;
     void removeFarChunks(glm::vec3 block_position_to_render_around);
     void addNewChunks(glm::vec3 block_position_to_render_around);
     void cleanStoredChunks(glm::vec3 block_position_to_render_around);
