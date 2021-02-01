@@ -43,7 +43,7 @@ int main()
         events.process(&eventHolder, camera);
 		events.update(camera);
 
-        world.render( camera);
+        world.render(camera);
 
         currentTime = SDL_GetTicks();
         numFrames++;

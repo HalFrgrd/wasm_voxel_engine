@@ -1,6 +1,7 @@
 #include "chunk.h"
 
 
+
 int Chunk::flattenCoords(int i, int j, int k){
     int val = i + chunkSize*j + chunkSize*chunkSize*k;
     // if(val < 0 || val >= chunkSize*chunkSize*chunkSize){
@@ -54,12 +55,12 @@ void Chunk::setChunkCoords(int x, int y, int z){
 }
 
 // Chunk::Chunk(World& initWorld): my_world(initWorld) {
-Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer* renderer) {
+Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer *initRenderer) {
+
+    
+    mesh = new ChunkMesh(initRenderer);
 
     my_world = initWorld;
-    ChunkMesh my_mesh(renderer);
-    mesh = &my_mesh;
-
     chunkX = _chunkX;
     chunkY = _chunkY;
     chunkZ = _chunkZ;
@@ -67,7 +68,16 @@ Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGen
     for(int k = 0; k < chunkSize; k++){
         for(int i = 0; i < chunkSize; i++){
             for(int j = 0; j < chunkSize; j++){
-
+                // int heightThreshold = 4+ (rand()%4);
+                // if(j > heightThreshold){
+                //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
+                // } else{
+                //     if(rand()%5 == 1){
+                //         cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
+                //     }else{
+                //         cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
+                //     }
+                // }
                 cubePositions[flattenCoords(i,j,k)] = terrain->getBlock(localPosToGlobalPos(i,j,k));
                 
             }
@@ -98,7 +108,6 @@ bool Chunk::compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFa
 
     return blockA == blockB && Block::isSolid(blockA) && isBlockFaceVisible(b, direction, isBackFace);
 }
-
 
 void Chunk::generateGreedyMesh(){
 
@@ -239,60 +248,32 @@ void Chunk::generateGreedyMesh(){
 
 void Chunk::renderChunk( Camera &camera){
 
+    // Bind the vertex array
+    glBindVertexArrayOES( (mesh->vertex_array_buffer) );
 
     if( ! lastMeshStillValid){
         generateGreedyMesh();
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
+        glBufferData(GL_ARRAY_BUFFER, (mesh->colours).size()*sizeof(float), &(mesh->colours[0]), GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
+        glBufferData(GL_ARRAY_BUFFER, (mesh->vertices).size()*sizeof(float), &(mesh->vertices[0]), GL_STATIC_DRAW);
+        
         lastMeshStillValid = true;
+    }else{
+        // Just bind my buffers
+        // glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
+        // glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
     }
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
-    glBufferData(GL_ARRAY_BUFFER, mesh->colours.size()*sizeof(float), &mesh->colours[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(float), &mesh->vertices[0], GL_STATIC_DRAW);
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.9,0.5,0.1));
 
     // std::cout<<mesh.vertices.size()<<std::endl;
 
-    glDrawArrays(GL_TRIANGLES, 0, mesh->vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size());
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.0,0.0,0.0));
     // glDrawArrays(GL_LINES, 0, mesh.vertices.size());
 
 }
 
-ChunkMesh::ChunkMesh(Renderer* renderer){
-    vertex_buffer = renderer->getVertexBuffer();
-    colour_buffer = renderer->getColourBuffer();
-}
-
-void ChunkMesh::addVertex(glm::vec4 vertex, glm::vec3 colour){
-    vertices.push_back(vertex.x);
-    vertices.push_back(vertex.y);
-    vertices.push_back(vertex.z);
-
-    colours.push_back(colour.x);
-    colours.push_back(colour.y);
-    colours.push_back(colour.z);
-}
-
-void ChunkMesh::addQuad(glm::vec4 quadVertices[],glm::vec3 colour, bool isBackFace ){
-
-    if (!isBackFace) {
-        addVertex(quadVertices[0], colour);
-        addVertex(quadVertices[1], colour);
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[0], colour);
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[3], colour);
-    } else {
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[1], colour);
-        addVertex(quadVertices[0], colour);
-        addVertex(quadVertices[3], colour);
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[0], colour);
-    }
-}

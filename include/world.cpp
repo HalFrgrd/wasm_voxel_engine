@@ -1,16 +1,16 @@
 #include "world.h"
 #include "chunk.h"
 
-World::World(Renderer *init_renderer) {
+World::World(Renderer *initRenderer): renderer(initRenderer) {
 
-    renderer = init_renderer;
-
+    printf("Started chunk generation");
     for(int x = 0; x< 5; x ++){
         for(int z = 0; z<5; z++){
-            Chunk* new_chunk = new Chunk(this,x,0,z, &terrain, renderer);
+            Chunk* new_chunk = new Chunk(this,x,0,z, &terrain, initRenderer);
             worldChunks.push_back(new_chunk);
         }
     }
+    printf("Finished chunk generation");
   
     
 }
@@ -54,7 +54,7 @@ void World::render( Camera &camera){
 
     for (int i = 0; i < worldChunks.size(); i++)
     {
-        worldChunks[i]->renderChunk(camera);
+        worldChunks[i]->renderChunk( camera);
     }
 
     SDL_GL_SwapWindow(renderer->window);

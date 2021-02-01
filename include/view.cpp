@@ -5,6 +5,14 @@
 #include <iostream>
 #include "view.h"
 
+GLuint Renderer::getVertexArrayBuffer(){
+  GLuint vao;
+     
+  glGenVertexArraysOES(1, &vao);
+  glBindVertexArrayOES(vao);
+
+  return vao;
+}
 
 GLuint Renderer::getVertexBuffer(){
   GLuint buffer_id;
@@ -46,13 +54,12 @@ void Renderer::initRender(){
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_FRONT_AND_BACK);
 
-    
-    // glGenVertexArraysOES(1, &vao);
+ 
+
     // glGenBuffers(1, &colours);
     // glGenBuffers(1, &vbo);
     // glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    // glBindVertexArrayOES(vao);
     
     my_shader.initShader("./include/shaders/vertex_shader.vs","./include/shaders/fragment_shader.fs");
     my_shader.activate();

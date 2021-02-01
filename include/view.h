@@ -20,14 +20,16 @@ public:
 
 
     SDL_Window *window;
-    GLuint vbo, vao, colours;
+    GLuint vertex_array_object;
+
+    // GLuint vbo, vao, colours;
     Shader my_shader;
 
 
     void initRender();
+    GLuint getVertexArrayBuffer();
     GLuint getVertexBuffer();
     GLuint getColourBuffer();
-
 
 
 };

@@ -11,12 +11,12 @@ public:
     FastNoiseLite noise;
     
     TerrainGenerator(){
-        noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
+        noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     }
 
     Block::BlockType getBlock(glm::ivec3 pos) {
 
-        float temp_noise = noise.GetNoise((float)pos.x,(float)pos.z);
+        float temp_noise = noise.GetNoise((float)pos.x,(float)pos.y,(float)pos.z);
 
         if(temp_noise < 0.1){
             return Block::BLOCK_AIR;
