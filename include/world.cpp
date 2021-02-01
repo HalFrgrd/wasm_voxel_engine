@@ -50,15 +50,23 @@ float maxivec3(glm::ivec3 v){
 }
 
 void World::removeFarChunks(glm::vec3 block_position_to_render_around){
+    int chunks_removed_this_frame = 0;
+
+
     glm::ivec3 chunk_position_to_render_around = getChunkCoordsFromBlock(block_position_to_render_around);
     
 
     for (auto chunk_pair = worldChunks.cbegin(); chunk_pair != worldChunks.cend(); ) {
         if( glm::compMax( glm::abs(chunk_pair->first - chunk_position_to_render_around)) > radius + 1 ){
-            printf("Removing chunk with chunk index:  %d %d %d  \n", chunk_pair->first.x,chunk_pair->first.y,chunk_pair->first.z);
+            // printf("Removing chunk with chunk index:  %d %d %d  \n", chunk_pair->first.x,chunk_pair->first.y,chunk_pair->first.z);
             // Will this clean up the chunk object?
             delete worldChunks[chunk_pair->first];
             worldChunks.erase(chunk_pair++);
+
+            chunks_removed_this_frame++;
+            if(chunks_removed_this_frame >= 1){
+                return;
+            }
         }else{
             ++chunk_pair;
         }
@@ -66,6 +74,8 @@ void World::removeFarChunks(glm::vec3 block_position_to_render_around){
 }
 
 void World::addNewChunks(glm::vec3 block_position_to_render_around){
+
+    int chunks_added_this_frame = 0;
 
     glm::ivec3 chunk_position_to_render_around = getChunkCoordsFromBlock(block_position_to_render_around);
     glm::ivec3 chunk_offset = glm::ivec3(0);
@@ -78,10 +88,15 @@ void World::addNewChunks(glm::vec3 block_position_to_render_around){
         glm::ivec3 chunk_to_add_pos = chunk_position_to_render_around + chunk_offset;
 
         if(worldChunks.find(chunk_to_add_pos) == worldChunks.end()){
+            chunks_added_this_frame++;
+
             Chunk* new_chunk = new Chunk(this,chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z, &terrain, renderer);
             worldChunks[chunk_to_add_pos] = new_chunk;
-            printf("Adding chunk with chunk index:  %d %d %d  \n", chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z);
+            // printf("Adding chunk with chunk index:  %d %d %d  \n", chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z);
 
+            if(chunks_added_this_frame >= 1){
+                return;
+            }
         }
 
         // std::cout<<worldChunks.size()<<std::endl;

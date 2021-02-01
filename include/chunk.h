@@ -35,7 +35,7 @@ public:
     ChunkMesh *mesh;
     bool lastMeshStillValid = false;
 
-	static const int chunkSize = 32;
+	static const int chunkSize = 16;
 
     Block::BlockType cubePositions[chunkSize*chunkSize*chunkSize];
 

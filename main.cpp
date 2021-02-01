@@ -19,7 +19,10 @@
 // extern "C" void EMSCRIPTEN_KEEPALIVE toggle_background_color() { background_is_black = !background_is_black; }
 
 std::function<void()> loop;
-void main_loop() { loop(); }
+// Emscripten / browser will limit main_loop to 60 Hz.
+// Easy hack to boost frame rate, just rain the loop multple
+// times per call of main_loop! 
+void main_loop() { loop(); loop(); loop(); loop(); }
 
 int main()
 {
