@@ -1,12 +1,13 @@
 #include "world.h"
 #include "chunk.h"
 
-World::World() {
+World::World(Renderer *init_renderer) {
 
+    renderer = init_renderer;
 
     for(int x = 0; x< 5; x ++){
         for(int z = 0; z<5; z++){
-            Chunk* new_chunk = new Chunk(this,x,0,z, &terrain);
+            Chunk* new_chunk = new Chunk(this,x,0,z, &terrain, renderer);
             worldChunks.push_back(new_chunk);
         }
     }
@@ -35,14 +36,14 @@ Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int block
     return Block::BLOCK_AIR;
 }
 
-void World::render(Renderer &renderer, Camera &camera){
+void World::render( Camera &camera){
 
-    renderer.my_shader.setMat4("view", camera.GetViewMatrix());
+    renderer->my_shader.setMat4("view", camera.GetViewMatrix());
 
 
-    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)renderer.screen_width / (float)renderer.screen_height, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)renderer->screen_width / (float)renderer->screen_height, 0.1f, 100.0f);
     // glm::mat4 projection = glm::mat4(1.0f);
-    renderer.my_shader.setMat4("projection", projection);
+    renderer->my_shader.setMat4("projection", projection);
 
     // Set background color
     glClearColor(0.2f, 0.7f, 0.9f, 1.0f);
@@ -53,9 +54,9 @@ void World::render(Renderer &renderer, Camera &camera){
 
     for (int i = 0; i < worldChunks.size(); i++)
     {
-        worldChunks[i]->renderChunk(renderer, camera);
+        worldChunks[i]->renderChunk(camera);
     }
 
-    SDL_GL_SwapWindow(renderer.window);
+    SDL_GL_SwapWindow(renderer->window);
 
 }

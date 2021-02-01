@@ -14,9 +14,15 @@
 
 class ChunkMesh{
 public:
+
+    ChunkMesh(Renderer* renderer);
+
     
     std::vector<GLfloat> vertices;
     std::vector<GLfloat> colours;
+
+    GLuint vertex_buffer;
+    GLuint colour_buffer;
 
     void addQuad(glm::vec4 quadVertices[], glm::vec3 colour, bool isBackFace );
     void addVertex(glm::vec4 vertex, glm::vec3 colour);
@@ -26,7 +32,7 @@ public:
 class Chunk{
 public:
 
-    Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain);
+    Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer* renderer);
     
 	void setChunkCoords(int x, int y, int z);
     World *my_world;
@@ -35,7 +41,7 @@ public:
     int chunkY;
     int chunkZ;
 
-    ChunkMesh mesh;
+    ChunkMesh *mesh;
     bool lastMeshStillValid = false;
 
 	static const int chunkSize = 32;
@@ -50,7 +56,7 @@ public:
     Block::BlockType getBlockFromChunk(glm::ivec3 coords);
 
     void generateGreedyMesh();
-    void renderChunk(Renderer &renderer, Camera &camera);
+    void renderChunk( Camera &camera);
 
     bool isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace);
     bool compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFace);

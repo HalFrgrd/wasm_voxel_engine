@@ -54,9 +54,12 @@ void Chunk::setChunkCoords(int x, int y, int z){
 }
 
 // Chunk::Chunk(World& initWorld): my_world(initWorld) {
-Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain) {
+Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer* renderer) {
 
     my_world = initWorld;
+    ChunkMesh my_mesh(renderer);
+    mesh = &my_mesh;
+
     chunkX = _chunkX;
     chunkY = _chunkY;
     chunkZ = _chunkZ;
@@ -64,16 +67,7 @@ Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGen
     for(int k = 0; k < chunkSize; k++){
         for(int i = 0; i < chunkSize; i++){
             for(int j = 0; j < chunkSize; j++){
-                // int heightThreshold = 4+ (rand()%4);
-                // if(j > heightThreshold){
-                //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
-                // } else{
-                //     if(rand()%5 == 1){
-                //         cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
-                //     }else{
-                //         cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
-                //     }
-                // }
+
                 cubePositions[flattenCoords(i,j,k)] = terrain->getBlock(localPosToGlobalPos(i,j,k));
                 
             }
@@ -114,8 +108,8 @@ void Chunk::generateGreedyMesh(){
     // glBindVertexArray(renderer.vao);
     glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize, chunkZ *chunkSize );
     // glm::vec3 chunkShift = glm::vec3(0.0f);
-    mesh.vertices.clear();
-    mesh.colours.clear();
+    mesh->vertices.clear();
+    mesh->colours.clear();
 
     glm::ivec3 quadSize;
 
@@ -229,7 +223,7 @@ void Chunk::generateGreedyMesh(){
 
                     // glm::vec3 quadColour = Block::blockColour(startBlock);
         
-                    mesh.addQuad(quads,quadColour,isBackFace);
+                    mesh->addQuad(quads,quadColour,isBackFace);
 
                     for (int f = 0; f < quadSize[workAxis1]; f++) {
                         for (int g = 0; g < quadSize[workAxis2]; g++) {
@@ -243,7 +237,7 @@ void Chunk::generateGreedyMesh(){
     }
 }
 
-void Chunk::renderChunk(Renderer &renderer, Camera &camera){
+void Chunk::renderChunk( Camera &camera){
 
 
     if( ! lastMeshStillValid){
@@ -252,21 +246,26 @@ void Chunk::renderChunk(Renderer &renderer, Camera &camera){
     }
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, renderer.colours);
-    glBufferData(GL_ARRAY_BUFFER, mesh.colours.size()*sizeof(float), &mesh.colours[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
+    glBufferData(GL_ARRAY_BUFFER, mesh->colours.size()*sizeof(float), &mesh->colours[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, renderer.vbo);
-    glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size()*sizeof(float), &mesh.vertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size()*sizeof(float), &mesh->vertices[0], GL_STATIC_DRAW);
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.9,0.5,0.1));
 
     // std::cout<<mesh.vertices.size()<<std::endl;
 
-    glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, mesh->vertices.size());
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.0,0.0,0.0));
     // glDrawArrays(GL_LINES, 0, mesh.vertices.size());
 
+}
+
+ChunkMesh::ChunkMesh(Renderer* renderer){
+    vertex_buffer = renderer->getVertexBuffer();
+    colour_buffer = renderer->getColourBuffer();
 }
 
 void ChunkMesh::addVertex(glm::vec4 vertex, glm::vec3 colour){

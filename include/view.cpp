@@ -6,6 +6,30 @@
 #include "view.h"
 
 
+GLuint Renderer::getVertexBuffer(){
+  GLuint buffer_id;
+  glGenBuffers(1, &buffer_id);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+
+  GLint posAttrib = my_shader.getAttribLocation("position");
+  glEnableVertexAttribArray(posAttrib);
+  glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  return buffer_id;
+}
+
+GLuint Renderer::getColourBuffer(){
+  GLuint buffer_id;
+  glGenBuffers(1, &buffer_id);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+
+  GLint colourAttrib = my_shader.getAttribLocation("vertex_colour");
+  glEnableVertexAttribArray(colourAttrib);
+  glVertexAttribPointer(colourAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+  return buffer_id;
+}
+
 void Renderer::initRender(){
 
     SDL_CreateWindowAndRenderer(screen_width, screen_height, 0, &window, nullptr);
@@ -24,9 +48,9 @@ void Renderer::initRender(){
 
     
     // glGenVertexArraysOES(1, &vao);
-    glGenBuffers(1, &colours);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    // glGenBuffers(1, &colours);
+    // glGenBuffers(1, &vbo);
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     // glBindVertexArrayOES(vao);
     
@@ -34,13 +58,13 @@ void Renderer::initRender(){
     my_shader.activate();
 
     // Specify the layout of the vertex data
-    GLint posAttrib = my_shader.getAttribLocation("position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    // GLint posAttrib = my_shader.getAttribLocation("position");
+    // glEnableVertexAttribArray(posAttrib);
+    // glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, colours);
-    GLint colourAttrib = my_shader.getAttribLocation("vertex_colour");
-    glEnableVertexAttribArray(colourAttrib);
-    glVertexAttribPointer(colourAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, colours);
+    // GLint colourAttrib = my_shader.getAttribLocation("vertex_colour");
+    // glEnableVertexAttribArray(colourAttrib);
+    // glVertexAttribPointer(colourAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
 }

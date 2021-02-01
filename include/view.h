@@ -25,6 +25,9 @@ public:
 
 
     void initRender();
+    GLuint getVertexBuffer();
+    GLuint getColourBuffer();
+
 
 
 };

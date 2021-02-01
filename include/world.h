@@ -16,8 +16,9 @@ public:
     std::vector<Chunk*> worldChunks;
     TerrainGenerator terrain;
     
-    World();
-    void render(Renderer &renderer, Camera &camera);
+    World(Renderer *init_renderer);
+    Renderer* renderer;
+    void render(Camera &camera);
     Block::BlockType worldgetBlockFromWorld(int blockX, int blockY, int blockZ);
 
     Chunk* getChunk(int chunkX, int chunkY, int chunkZ);

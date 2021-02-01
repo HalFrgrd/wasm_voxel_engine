@@ -27,7 +27,7 @@ int main()
     Renderer renderer;
     renderer.initRender();
 
-    World world;
+    World world(&renderer);
 
     EventHandler events;
     SDL_Event eventHolder;
@@ -43,7 +43,7 @@ int main()
         events.process(&eventHolder, camera);
 		events.update(camera);
 
-        world.render(renderer, camera);
+        world.render( camera);
 
         currentTime = SDL_GetTicks();
         numFrames++;
