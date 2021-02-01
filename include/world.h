@@ -6,6 +6,8 @@
 #include "camera.h"
 #include "block.h"
 #include "terrain.h"
+#include <unordered_map>
+#include <glm/gtx/hash.hpp>
 
 class Chunk;
 
@@ -13,7 +15,7 @@ class Chunk;
 
 class World{
 public:
-    std::vector<Chunk*> worldChunks;
+    std::unordered_map<glm::ivec3, Chunk*> worldChunks;
     TerrainGenerator terrain;
     
     World(Renderer *initRenderer);
