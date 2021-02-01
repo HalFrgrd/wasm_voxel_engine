@@ -91,6 +91,10 @@ Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGen
 
 }
 
+Chunk::~Chunk(){
+    delete mesh;
+}
+
 bool Chunk::isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace){
     glm::ivec3 temp = blockPos;
     if(isBackFace){

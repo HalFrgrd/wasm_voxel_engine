@@ -23,7 +23,8 @@ class Chunk{
 public:
 
     Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer* initRenderer);
-    
+    ~Chunk();
+
 	void setChunkCoords(int x, int y, int z);
     World *my_world;
 
@@ -50,8 +51,6 @@ public:
 
     bool isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace);
     bool compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFace);
-
-
 
 };
 

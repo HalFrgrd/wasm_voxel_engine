@@ -1,6 +1,8 @@
 #ifndef CHUNKMESH_H
 #define CHUNKMESH_H
 
+#define GL_GLEXT_PROTOTYPES 1
+
 #include <SDL.h>
 
 #include <SDL_opengles2.h>
@@ -16,6 +18,7 @@ class ChunkMesh{
 public:
 
     ChunkMesh(Renderer *initRenderer);
+    ~ChunkMesh();
     
     std::vector<GLfloat> vertices;
     std::vector<GLfloat> colours;

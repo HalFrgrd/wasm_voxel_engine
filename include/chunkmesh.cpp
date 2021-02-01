@@ -6,6 +6,12 @@ ChunkMesh::ChunkMesh(Renderer *initRenderer) : renderer(initRenderer){
     colour_buffer = initRenderer->getColourBuffer();
 }
 
+ChunkMesh::~ChunkMesh() {
+    glDeleteVertexArraysOES(1, &vertex_array_buffer);
+    glDeleteBuffers(1, &vertex_buffer);
+    glDeleteBuffers(1, &colour_buffer);
+}
+
 void ChunkMesh::addVertex(glm::vec4 vertex, glm::vec3 colour){
     vertices.push_back(vertex.x);
     vertices.push_back(vertex.y);

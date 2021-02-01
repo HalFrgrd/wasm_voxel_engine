@@ -26,7 +26,7 @@ const float PITCH       =  0.0f;
 const float SPEED       =  0.55f;
 const float SENSITIVITY =  0.4f;
 const float ZOOM        =  45.0f;
-
+const float CAMERA_TO_WORLD_POS_SCALE = 0.1;
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera
@@ -68,7 +68,7 @@ public:
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 GetViewMatrix()
     {
-        return glm::scale(glm::lookAt(Position, Position + Front, Up), glm::vec3(0.1));
+        return glm::scale(glm::lookAt(Position, Position + Front, Up), glm::vec3(CAMERA_TO_WORLD_POS_SCALE));
     }
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
