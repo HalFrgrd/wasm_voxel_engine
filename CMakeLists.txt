@@ -7,16 +7,22 @@ set(CMAKE_CXX_COMPILER "emcc")
 project(wasm_voxel_engine)
 
 include_directories(include)
+include_directories(include/imgui)
 
 set(CMAKE_CXX_STANDARD 11)
 
 # specific flags for the emcc command
 # we need to embed (or preload) our assets
+# set(CMAKE_CXX_FLAGS  
+#     "-O1 -s WASM=1 -s USE_SDL=2 -s NO_FILESYSTEM=1 -DIMGUI_DISABLE_FILE_FUNCTIONS -s TOTAL_MEMORY=1024MB -s ALLOW_MEMORY_GROWTH=1 -s LLD_REPORT_UNDEFINED --embed-file ../include/shaders"
+# )
+
+# Probably a better way to do this
 set(CMAKE_CXX_FLAGS  
-    "-O1 -s WASM=1 -s USE_SDL=2 -s TOTAL_MEMORY=1024MB -s LLD_REPORT_UNDEFINED --embed-file ../include/shaders"
+    "-O1 --embed-file ../include/shaders -s USE_SDL=2 -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1"
 )
 
-file(GLOB SOURCES "include/*.cpp")
+file(GLOB SOURCES  "include/imgui/*.cpp" "include/*.cpp")
 
 add_executable(wasm_voxel_engine main.cpp ${SOURCES})
 set_target_properties(wasm_voxel_engine PROPERTIES OUTPUT_NAME "index")

@@ -120,10 +120,7 @@ void World::render( Camera &camera){
     // glm::mat4 projection = glm::mat4(1.0f);
     renderer->my_shader.setMat4("projection", projection);
 
-    // Set background color
-    glClearColor(0.2f, 0.7f, 0.9f, 1.0f);
-    //https://learnopengl.com/Getting-started/Coordinate-Systems read the bit about depth
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
 
 
     cleanStoredChunks(camera.Position / CAMERA_TO_WORLD_POS_SCALE);
@@ -132,6 +129,5 @@ void World::render( Camera &camera){
         chunk_pair.second->renderChunk(camera);
     }
 
-    SDL_GL_SwapWindow(renderer->window);
 
 }

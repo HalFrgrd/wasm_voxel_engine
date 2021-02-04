@@ -20,6 +20,8 @@ public:
 
 
     SDL_Window *window;
+    SDL_GLContext context;
+
     GLuint vertex_array_object;
 
     // GLuint vbo, vao, colours;

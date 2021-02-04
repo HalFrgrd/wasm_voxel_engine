@@ -252,7 +252,7 @@ void Chunk::generateGreedyMesh(){
 
 void Chunk::renderChunk( Camera &camera){
 
-    // Bind the vertex array
+    // Bind the chunk's vertex array
     glBindVertexArrayOES( (mesh->vertex_array_buffer) );
 
     if( ! lastMeshStillValid){
