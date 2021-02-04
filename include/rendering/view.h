@@ -15,8 +15,8 @@ float getBackgroundColor();
 
 class Renderer{
 public:
-    const int screen_width = 800;
-    const int screen_height = 600;
+    int screen_width;
+    int screen_height;
 
 
     SDL_Window *window;
