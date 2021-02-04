@@ -73,14 +73,15 @@ int main()
         // IM_UNUSED(arg); // We can pass this argument as the second parameter of emscripten_set_main_loop_arg(), but we don't use that.
 
         // Our state (make them static = more or less global) as a convenience to keep the example terse.
-        static bool show_demo_window = true;
-        static bool show_another_window = false;
+        bool show_demo_window = true;
+        bool show_another_window = false;
         static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 0.50f);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(renderer.window);
         ImGui::NewFrame();
+        
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
@@ -124,13 +125,18 @@ int main()
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        world.render(camera);
 
         ImGui::Render();
+        world.render(camera);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(renderer.window);
     };
 
     // This function call won't return, and will engage in an infinite loop, processing events from the browser, and dispatching them.
     emscripten_set_main_loop(main_loop, 0, true);
+
+    
+
+    return EXIT_SUCCESS;
+
 }
