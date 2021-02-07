@@ -17,18 +17,18 @@ set(CMAKE_CXX_STANDARD 11)
 
 # Probably a better way to do this
 set(CMAKE_CXX_FLAGS  
-    "-O1 -s WASM=1 --embed-file ../include/shaders -s USE_SDL=2 -s TOTAL_MEMORY=1024MB -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1"
+    "-O1 -s WASM=1 --embed-file ../include/shaders -s USE_SDL=2 -s TOTAL_MEMORY=1024MB -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s LLD_REPORT_UNDEFINED"
 )
 
 include_directories(include)
-include_directories(include/imgui)
+include_directories(include/gui_interface/imgui)
 include_directories(include/gui_interface)
 include_directories(include/physical_world)
 include_directories(include/rendering)
 
 file(GLOB SOURCES  
     "include/*.cpp"
-    "include/imgui/*.cpp" 
+    "include/gui_interface/imgui/*.cpp" 
     "include/gui_interface/*.cpp" 
     "include/physical_world/*.cpp" 
     "include/rendering/*.cpp" 

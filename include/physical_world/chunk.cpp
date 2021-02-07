@@ -273,7 +273,7 @@ void Chunk::renderChunk( Camera &camera){
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.9,0.5,0.1));
 
     // std::cout<<mesh.vertices.size()<<std::endl;
-
+    
     glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size());
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.0,0.0,0.0));
