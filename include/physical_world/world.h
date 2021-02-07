@@ -9,9 +9,10 @@
 #include <unordered_map>
 #include <glm/gtx/hash.hpp>
 #include <glm/gtx/component_wise.hpp>
+#include "interface.h"
+#include "timer.h"
 
-class Chunk;
-
+// Forward declaration of chunk
 class Chunk;
 
 class World{
@@ -19,8 +20,10 @@ public:
     std::unordered_map<glm::ivec3, Chunk*> worldChunks;
     TerrainGenerator terrain;
     
-    World(Renderer *initRenderer);
+    World(Renderer *initRenderer, GUI_Interface *initInterface);
     Renderer *renderer;
+    GUI_Interface *interface;
+
     void render(Camera &camera);
 
     const static int radius = 2;

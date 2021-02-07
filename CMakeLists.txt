@@ -25,6 +25,7 @@ include_directories(include/gui_interface/imgui)
 include_directories(include/gui_interface)
 include_directories(include/physical_world)
 include_directories(include/rendering)
+include_directories(include/helper)
 
 file(GLOB SOURCES  
     "include/*.cpp"
@@ -32,6 +33,7 @@ file(GLOB SOURCES
     "include/gui_interface/*.cpp" 
     "include/physical_world/*.cpp" 
     "include/rendering/*.cpp" 
+    "include/helper/*.cpp" 
     )
 
 add_executable(wasm_voxel_engine main.cpp ${SOURCES})

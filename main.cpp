@@ -33,9 +33,10 @@ int main()
     Renderer renderer;
     renderer.initRender();
 
-    World world(&renderer);
-
     GUI_Interface interface(&renderer);
+
+    World world(&renderer, &interface);
+
 
     EventHandler events;
     SDL_Event eventHolder;
@@ -45,8 +46,6 @@ int main()
     int lastTime = SDL_GetTicks();
     int currentTime;
     int numFrames = 0;
-
-    
     
     loop = [&] {
         events.process(&eventHolder, camera);
@@ -58,7 +57,7 @@ int main()
         SDL_GL_MakeCurrent(renderer.window, renderer.context);
         glViewport(0, 0, (int)interface.io->DisplaySize.x, (int)interface.io->DisplaySize.y);
         
-        glClearColor(0.5, 0.5, 0.5, 1.0);
+        glClearColor(144.0/255.0, 202.0/255.0, 249.0/255.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ImGui::Render();

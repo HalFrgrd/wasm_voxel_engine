@@ -55,12 +55,13 @@ void Chunk::setChunkCoords(int x, int y, int z){
 }
 
 // Chunk::Chunk(World& initWorld): my_world(initWorld) {
-Chunk::Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer *initRenderer) {
-
+Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer *initRenderer) {
     
     mesh = new ChunkMesh(initRenderer);
 
     my_world = initWorld;
+    interface = initInterface;
+
     chunkX = _chunkX;
     chunkY = _chunkY;
     chunkZ = _chunkZ;
@@ -114,7 +115,7 @@ bool Chunk::compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFa
 }
 
 void Chunk::generateGreedyMesh(){
-
+    SimpleTimer timer;
 
     // https://eddieabbondanz.io/post/voxel/greedy-mesh/
 
@@ -248,6 +249,9 @@ void Chunk::generateGreedyMesh(){
             }
         }
     }
+
+    interface->chunkMeshGenTime->enqueue(timer.end());
+
 }
 
 void Chunk::renderChunk( Camera &camera){

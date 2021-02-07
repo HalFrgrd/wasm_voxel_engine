@@ -16,17 +16,18 @@
 #include "world.h"
 #include "terrain.h"
 #include "chunkmesh.h"
-
-
+#include "timer.h"
+#include "interface.h"
 
 class Chunk{
 public:
 
-    Chunk(World *initWorld, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer* initRenderer);
+    Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer* initRenderer);
     ~Chunk();
 
 	void setChunkCoords(int x, int y, int z);
     World *my_world;
+    GUI_Interface *interface;
 
     int chunkX;
     int chunkY;
@@ -35,7 +36,7 @@ public:
     ChunkMesh *mesh;
     bool lastMeshStillValid = false;
 
-	static const int chunkSize = 16;
+	static const int chunkSize = 32;
 
     Block::BlockType cubePositions[chunkSize*chunkSize*chunkSize];
 

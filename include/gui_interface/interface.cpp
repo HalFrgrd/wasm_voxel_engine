@@ -22,10 +22,6 @@ GUI_Interface::GUI_Interface(Renderer *initRenderer): renderer(initRenderer) {
     ImGui_ImplSDL2_InitForOpenGL(renderer->window, renderer->context);
     // ImGui_ImplOpenGL3_Init(glsl_version);
     ImGui_ImplOpenGL3_Init();
-
-
-    f = 0.0f;
-    counter = 0;
 }
 
 void GUI_Interface::update(){
@@ -34,7 +30,6 @@ void GUI_Interface::update(){
     // Our state (make them static = more or less global) as a convenience to keep the example terse.
     static bool show_demo_window = true;
     static bool show_another_window = false;
-    static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 0.50f);
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -61,7 +56,11 @@ void GUI_Interface::update(){
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if( ImGui::TreeNode("Chunk rendering")){
-        ImGui::Text("Chunks rendered: %d", counter);
+        ImGui::Text("Chunks initialised: %d", chunkInitialisations);
+        ImGui::Text("Chunks deletions: %d", chunkDeletions);
+        ImGui::Text("Chunks init time: %d", chunkInitTime->average());
+        ImGui::Text("Chunks mesh gen time: %d", chunkMeshGenTime->average());
+        ImGui::Text("Chunks del time: %d", chunkDelTime->average());
         ImGui::TreePop();
     }
 

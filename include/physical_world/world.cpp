@@ -1,7 +1,9 @@
 #include "world.h"
 #include "chunk.h"
 
-World::World(Renderer *initRenderer): renderer(initRenderer) {
+World::World(Renderer *initRenderer, GUI_Interface *initInterface): 
+    renderer(initRenderer),
+    interface(initInterface) {
 
     // printf("Started chunk generation");
     // for(int x = 0; x< 5; x ++){
@@ -31,12 +33,6 @@ glm::ivec3 getInternalChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
 Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int blockZ){
     glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
 
-    // if (0<= chunkCoords.x  && chunkCoords.x < 5 &&
-    //     0 == chunkCoords.y &&
-    //     0<= chunkCoords.z && chunkCoords.z < 5 ){
-    //         return worldChunks[chunkCoords.x + 5* chunkCoords.z]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
-    //     }
-
     if (worldChunks.find(chunkCoords) != worldChunks.end()){
 
         return worldChunks[chunkCoords]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
@@ -58,12 +54,20 @@ void World::removeFarChunks(glm::vec3 block_position_to_render_around){
 
     for (auto chunk_pair = worldChunks.cbegin(); chunk_pair != worldChunks.cend(); ) {
         if( glm::compMax( glm::abs(chunk_pair->first - chunk_position_to_render_around)) > radius + 1 ){
+            SimpleTimer timer;
+
+            
             // printf("Removing chunk with chunk index:  %d %d %d  \n", chunk_pair->first.x,chunk_pair->first.y,chunk_pair->first.z);
             // Will this clean up the chunk object?
             delete worldChunks[chunk_pair->first];
             worldChunks.erase(chunk_pair++);
 
             chunks_removed_this_frame++;
+            interface->chunkDeletions++;
+
+
+            interface->chunkDelTime->enqueue(timer.end());
+
             if(chunks_removed_this_frame >= 1){
                 return;
             }
@@ -71,6 +75,8 @@ void World::removeFarChunks(glm::vec3 block_position_to_render_around){
             ++chunk_pair;
         }
     }
+
+
 }
 
 void World::addNewChunks(glm::vec3 block_position_to_render_around){
@@ -88,15 +94,25 @@ void World::addNewChunks(glm::vec3 block_position_to_render_around){
         glm::ivec3 chunk_to_add_pos = chunk_position_to_render_around + chunk_offset;
 
         if(worldChunks.find(chunk_to_add_pos) == worldChunks.end()){
-            chunks_added_this_frame++;
 
-            Chunk* new_chunk = new Chunk(this,chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z, &terrain, renderer);
+            SimpleTimer timer;
+
+            chunks_added_this_frame++;
+            interface->chunkInitialisations++;
+
+            Chunk* new_chunk = new Chunk(this, interface ,chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z, &terrain, renderer);
             worldChunks[chunk_to_add_pos] = new_chunk;
             // printf("Adding chunk with chunk index:  %d %d %d  \n", chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z);
+
+
+            
+            interface->chunkInitTime->enqueue(timer.end());
 
             if(chunks_added_this_frame >= 1){
                 return;
             }
+
+
         }
 
         // std::cout<<worldChunks.size()<<std::endl;
