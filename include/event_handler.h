@@ -3,11 +3,17 @@
 
 #include <SDL.h>
 #include "camera.h"
+#include "interface.h"
 
 class EventHandler{
 public:
-    void process(SDL_Event *e, Camera &camera);
-    void update(Camera &camera);
+    EventHandler(Camera *initCamera, GUI_Interface *initInterface); 
+    Camera *camera;
+    GUI_Interface *interface;
+
+
+    void process(SDL_Event *e);
+    void update();
     int prev_x;
     int prev_y;
     bool right_click_depressed = false;

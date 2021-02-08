@@ -33,12 +33,12 @@ public:
     void setVec3(const GLchar *name, const glm::vec3 &vec);
 
     
+    unsigned int shaderProgramID;
 
 private:
     GLuint initSpecificShader(std::string path, GLenum shaderType);
 
     // the program ID
-    unsigned int shaderProgramID;
 };
   
 #endif

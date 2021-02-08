@@ -2,7 +2,7 @@
 #define TERRAIN_H
 
 #include "block.h"
-#include "perlin_noise.h"
+#include "fastnoiselite.h"
 
 class TerrainGenerator {
 
@@ -11,14 +11,14 @@ public:
     FastNoiseLite noise;
     
     TerrainGenerator(){
-        noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+        noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
     }
 
     Block::BlockType getBlock(glm::ivec3 pos) {
 
-        float temp_noise = noise.GetNoise((float)pos.x,(float)pos.y,(float)pos.z);
+        float temp_noise = noise.GetNoise((float)pos.x,(float)pos.z);
 
-        if(temp_noise < 0.1){
+        if(pos.y + temp_noise*10 > 0){
             return Block::BLOCK_AIR;
         }
         return Block::BLOCK_STONE;

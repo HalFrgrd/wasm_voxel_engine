@@ -22,21 +22,21 @@ void ChunkMesh::addVertex(glm::vec4 vertex, glm::vec3 colour){
     colours.push_back(colour.z);
 }
 
-void ChunkMesh::addQuad(glm::vec4 quadVertices[],glm::vec3 colour, bool isBackFace ){
+void ChunkMesh::addQuad(glm::vec4 corner1, glm::vec4 corner2,glm::vec4 corner3,glm::vec4 corner4,glm::vec3 colour, bool isBackFace ){
 
     if (!isBackFace) {
-        addVertex(quadVertices[0], colour);
-        addVertex(quadVertices[1], colour);
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[0], colour);
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[3], colour);
+        addVertex(corner1, colour);
+        addVertex(corner2, colour);
+        addVertex(corner3, colour);
+        addVertex(corner1, colour);
+        addVertex(corner3, colour);
+        addVertex(corner4, colour);
     } else {
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[1], colour);
-        addVertex(quadVertices[0], colour);
-        addVertex(quadVertices[3], colour);
-        addVertex(quadVertices[2], colour);
-        addVertex(quadVertices[0], colour);
+        addVertex(corner3, colour);
+        addVertex(corner2, colour);
+        addVertex(corner1, colour);
+        addVertex(corner4, colour);
+        addVertex(corner3, colour);
+        addVertex(corner1, colour);
     }
 }

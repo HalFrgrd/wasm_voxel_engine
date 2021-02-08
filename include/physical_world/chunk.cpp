@@ -80,7 +80,9 @@ Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _c
                 //     }
                 // }
                 cubePositions[flattenCoords(i,j,k)] = terrain->getBlock(localPosToGlobalPos(i,j,k));
-                
+                if(cubePositions[flattenCoords(i,j,k)] != Block::BLOCK_AIR){
+                    isEmpty = false;
+                }
             }
         }
     }
@@ -115,13 +117,18 @@ bool Chunk::compareStep(glm::ivec3 a, glm::ivec3 b, int direction, bool isBackFa
 }
 
 void Chunk::generateGreedyMesh(){
-    SimpleTimer timer;
+
+    if(isEmpty){
+        return;
+    }
 
     // https://eddieabbondanz.io/post/voxel/greedy-mesh/
 
     // glBindVertexArray(renderer.vao);
     glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize, chunkZ *chunkSize );
-    // glm::vec3 chunkShift = glm::vec3(0.0f);
+    glm::mat4 model = glm::mat4(1.0f); 
+    model = glm::translate(model, chunkShift);
+    
     mesh->vertices.clear();
     mesh->colours.clear();
 
@@ -223,21 +230,18 @@ void Chunk::generateGreedyMesh(){
                     n[workAxis2] = (float) quadSize[workAxis2];
 
                     offsetPos = glm::vec4(startPos.x,startPos.y,startPos.z,1.0f);
-                    offsetPos[direction] += isBackFace ? 0.0f : 1.0f;
+                    if(! isBackFace){
+                        offsetPos[direction] += 1.0f;
+                    }
 
-                    glm::vec4 quads[4];
 
-                    glm::mat4 model = glm::mat4(1.0f); 
-                    model = glm::translate(model, chunkShift);
-
-                    quads[0] = model * offsetPos ;
-                    quads[1] = model *offsetPos+m;
-                    quads[2] = model *offsetPos+m+n;
-                    quads[3] = model *offsetPos+n;
-
-                    // glm::vec3 quadColour = Block::blockColour(startBlock);
         
-                    mesh->addQuad(quads,quadColour,isBackFace);
+                    mesh->addQuad(
+                        model *offsetPos,
+                        model *offsetPos+m,
+                        model *offsetPos+m+n,
+                        model *offsetPos+n,
+                        quadColour,isBackFace);
 
                     for (int f = 0; f < quadSize[workAxis1]; f++) {
                         for (int g = 0; g < quadSize[workAxis2]; g++) {
@@ -250,7 +254,7 @@ void Chunk::generateGreedyMesh(){
         }
     }
 
-    interface->chunkMeshGenTime->enqueue(timer.end());
+    
 
 }
 
@@ -260,12 +264,16 @@ void Chunk::renderChunk( Camera &camera){
     glBindVertexArrayOES( (mesh->vertex_array_buffer) );
 
     if( ! lastMeshStillValid){
+
+        SimpleTimer timer;
         generateGreedyMesh();
+        interface->chunkMeshGenTime->enqueue(timer.end());
+
         glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
-        glBufferData(GL_ARRAY_BUFFER, (mesh->colours).size()*sizeof(float), &(mesh->colours[0]), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (mesh->colours).size()*sizeof(GLfloat), &(mesh->colours[0]), GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
-        glBufferData(GL_ARRAY_BUFFER, (mesh->vertices).size()*sizeof(float), &(mesh->vertices[0]), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (mesh->vertices).size()*sizeof(GLfloat), &(mesh->vertices[0]), GL_STATIC_DRAW);
         
         lastMeshStillValid = true;
     }else{
@@ -273,12 +281,18 @@ void Chunk::renderChunk( Camera &camera){
         // glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
         // glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
     }
+
+    if(mesh->vertices.size() == 0 && ! declaredNoDraw){
+        interface->chunksNoDrawCall++;
+        declaredNoDraw = true;
+        return;
+    }
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.9,0.5,0.1));
 
     // std::cout<<mesh.vertices.size()<<std::endl;
     
-    glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size());
+    glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size()*sizeof(GLfloat)/3);
     
     // renderer.my_shader.setVec3("main_colour", glm::vec3(0.0,0.0,0.0));
     // glDrawArrays(GL_LINES, 0, mesh.vertices.size());

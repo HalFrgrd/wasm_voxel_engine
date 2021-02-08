@@ -31,6 +31,9 @@ glm::ivec3 getInternalChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
 }
 
 Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int blockZ){
+
+
+
     glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
 
     if (worldChunks.find(chunkCoords) != worldChunks.end()){
@@ -38,7 +41,8 @@ Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int block
         return worldChunks[chunkCoords]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
 
     }
-    return Block::BLOCK_AIR;
+    return terrain.getBlock(glm::ivec3(blockX,blockY,blockZ));
+    // return Block::BLOCK_AIR;
 }
 
 float maxivec3(glm::ivec3 v){

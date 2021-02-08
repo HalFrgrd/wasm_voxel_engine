@@ -37,36 +37,32 @@ void GUI_Interface::update(){
     ImGui::NewFrame();
 
      
-    
 
     // For some reason the demo window needs to be rendered once for something to show
     if (show_demo_window){
-        bool test = true;
-        ImGui::ShowDemoWindow(&test);
+        ImGui::ShowDemoWindow();
         show_demo_window = false;
     }
 
     IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
 
-    
+    if(showInterface){
+        ImGui::Begin("Debug info"); 
 
-    ImGui::Begin("Debug info"); 
+        ImGui::Text("Application average %.1f FPS", ImGui::GetIO().Framerate);
 
-    ImGui::Text("Application average %.1f FPS", ImGui::GetIO().Framerate);
-
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if( ImGui::TreeNode("Chunk rendering")){
-        ImGui::Text("Chunks initialised: %d", chunkInitialisations);
-        ImGui::Text("Chunks deletions: %d", chunkDeletions);
-        ImGui::Text("Chunks init time: %d", chunkInitTime->average());
-        ImGui::Text("Chunks mesh gen time: %d", chunkMeshGenTime->average());
-        ImGui::Text("Chunks del time: %d", chunkDelTime->average());
-        ImGui::TreePop();
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if( ImGui::TreeNode("Chunk rendering")){
+            ImGui::Text("Chunks initialised: %d", chunkInitialisations);
+            ImGui::Text("Chunks deletions: %d", chunkDeletions);
+            ImGui::Text("Chunks init time: %d", chunkInitTime->average());
+            ImGui::Text("Chunks mesh gen time: %d", chunkMeshGenTime->average());
+            ImGui::Text("Chunks del time: %d", chunkDelTime->average());
+            ImGui::Text("Chunks with empty mesh: %d", chunksNoDrawCall);
+            ImGui::TreePop();
+        }
+        
+        ImGui::End();
     }
-
-
-
-    ImGui::End();
-
 
 }

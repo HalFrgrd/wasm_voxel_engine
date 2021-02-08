@@ -41,7 +41,7 @@ public:
     Renderer *renderer;
     ImGuiIO *io;
 
-    float f = 0.0;
+    bool showInterface = true;
 
     // Total chunk initialisations
     int chunkInitialisations = 0;
@@ -57,6 +57,9 @@ public:
 
     // Time to delete chunks
     AveragingBuffer *chunkDelTime = new AveragingBuffer(125);
+
+    // Chunks with no mesh (all air)
+    int chunksNoDrawCall  = 0;
 
     GUI_Interface(Renderer *initRenderer);
 

@@ -35,6 +35,10 @@ public:
 
     ChunkMesh *mesh;
     bool lastMeshStillValid = false;
+    
+    // This chunk is all air, so no need to generate mesh
+    bool isEmpty = true; 
+    bool declaredNoDraw = false;
 
 	static const int chunkSize = 32;
 

@@ -29,7 +29,7 @@ public:
 
     Renderer *renderer;
 
-    void addQuad(glm::vec4 quadVertices[], glm::vec3 colour, bool isBackFace );
+    void addQuad(glm::vec4 corner1,glm::vec4 corner2,glm::vec4 corner3,glm::vec4 corner4, glm::vec3 colour, bool isBackFace );
     void addVertex(glm::vec4 vertex, glm::vec3 colour);
 
 };

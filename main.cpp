@@ -37,19 +37,19 @@ int main()
 
     World world(&renderer, &interface);
 
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
-    EventHandler events;
+    EventHandler events(&camera, &interface);
     SDL_Event eventHolder;
 
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     int lastTime = SDL_GetTicks();
     int currentTime;
     int numFrames = 0;
     
     loop = [&] {
-        events.process(&eventHolder, camera);
-		events.update(camera);
+        events.process(&eventHolder);
+		events.update();
 
         interface.update();
 
@@ -59,7 +59,7 @@ int main()
         
         glClearColor(144.0/255.0, 202.0/255.0, 249.0/255.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         ImGui::Render();
         world.render(camera);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
