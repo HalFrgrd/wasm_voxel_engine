@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "view.h"
+#include "camera.h"
 
 class AveragingBuffer {
 public:
@@ -36,10 +37,12 @@ public:
     }
 };
 
+
 class GUI_Interface {
 public:
     Renderer *renderer;
     ImGuiIO *io;
+    Camera *camera;
 
     bool showInterface = true;
 
@@ -58,10 +61,16 @@ public:
     // Time to delete chunks
     AveragingBuffer *chunkDelTime = new AveragingBuffer(125);
 
-    // Chunks with no mesh (all air)
+    // Chunks with no mesh (all air or all hidden)
     int chunksNoDrawCall  = 0;
 
-    GUI_Interface(Renderer *initRenderer);
+    // Length of chunk mesh gen queue
+    int chunk_mesh_gen_queue_size = 0;
+
+    // Length of chunk init queue
+    int chunk_init_queue_size = 0;
+
+    GUI_Interface(Renderer *initRenderer, Camera *initCamera);
 
     void update();
 };

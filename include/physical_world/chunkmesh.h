@@ -19,6 +19,8 @@ public:
 
     ChunkMesh(Renderer *initRenderer);
     ~ChunkMesh();
+
+    bool isFullyGenerated = false;
     
     std::vector<GLfloat> vertices;
     std::vector<GLfloat> colours;

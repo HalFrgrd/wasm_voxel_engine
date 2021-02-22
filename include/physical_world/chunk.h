@@ -5,10 +5,10 @@
 #define GL_GLEXT_PROTOTYPES 1
 
 #include <emscripten.h>
-
 #include <SDL.h>
-
 #include <SDL_opengles2.h>
+
+#include <pthread.h>
 
 #include "view.h"
 #include "camera.h"
@@ -28,6 +28,10 @@ public:
 	void setChunkCoords(int x, int y, int z);
     World *my_world;
     GUI_Interface *interface;
+    TerrainGenerator *terrain;
+
+    void initialiseTerrain();
+
 
     int chunkX;
     int chunkY;
@@ -35,14 +39,16 @@ public:
 
     ChunkMesh *mesh;
     bool lastMeshStillValid = false;
+    bool meshUnbuffered = false;
+    bool terrainPopulationFinished = false;
     
-    // This chunk is all air, so no need to generate mesh
+    // If this chunk is all air, so no need to generate mesh
     bool isEmpty = true; 
     bool declaredNoDraw = false;
 
 	static const int chunkSize = 32;
 
-    Block::BlockType cubePositions[chunkSize*chunkSize*chunkSize];
+    Block::BlockType *cubePositions = new Block::BlockType[chunkSize*chunkSize*chunkSize];
 
     int flattenCoords(glm::ivec3 coords);
 	int flattenCoords(int i, int j, int k);

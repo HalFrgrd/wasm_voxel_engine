@@ -14,7 +14,22 @@ World::World(Renderer *initRenderer, GUI_Interface *initInterface):
     //     }
     // }
     // printf("Finished chunk generation");
-    
+
+    // Spin up chunk meshing thread
+    int ret;
+    printf("In main: creating chunk meshing thread\n");
+    ret =  pthread_create(&chunk_mesh_gen_thread, NULL, &on_thread_gen_mesh_helper, this);
+    if(ret != 0) {
+        printf("Error: pthread_create() failed for chunk meshing thread\n");
+    }
+
+    // Spin up chunk initialising thread
+    printf("In main: creating chunk initialising thread\n");
+    ret =  pthread_create(&chunk_init_thread, NULL, &on_thread_chunk_init_helper, this);
+    if(ret != 0) {
+        printf("Error: pthread_create() failed for chunk init thread\n");
+    }
+
 }
 
 glm::ivec3 getChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
@@ -25,7 +40,6 @@ glm::ivec3 getChunkCoordsFromBlock(glm::ivec3 block_pos){
     return getChunkCoordsFromBlock(block_pos.x,block_pos.y,block_pos.z);
 }
 
-
 glm::ivec3 getInternalChunkCoordsFromBlock(int blockX, int blockY, int blockZ){
     return glm::ivec3(blockX%Chunk::chunkSize,blockY%Chunk::chunkSize,blockZ%Chunk::chunkSize);
 }
@@ -34,13 +48,13 @@ Block::BlockType World::worldgetBlockFromWorld(int blockX, int blockY, int block
 
 
 
-    glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
+    // glm::ivec3 chunkCoords = getChunkCoordsFromBlock(blockX, blockY, blockZ);
 
-    if (worldChunks.find(chunkCoords) != worldChunks.end()){
+    // if (worldChunks.find(chunkCoords) != worldChunks.end()){
 
-        return worldChunks[chunkCoords]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
+    //     return worldChunks[chunkCoords]->getBlockFromChunk(getInternalChunkCoordsFromBlock(blockX, blockY, blockZ));
 
-    }
+    // }
     return terrain.getBlock(glm::ivec3(blockX,blockY,blockZ));
     // return Block::BLOCK_AIR;
 }
@@ -57,7 +71,8 @@ void World::removeFarChunks(glm::vec3 block_position_to_render_around){
     
 
     for (auto chunk_pair = worldChunks.cbegin(); chunk_pair != worldChunks.cend(); ) {
-        if( glm::compMax( glm::abs(chunk_pair->first - chunk_position_to_render_around)) > radius + 1 ){
+        // Careful not to delete a chunk that is in the middle of being generated
+        if( glm::compMax( glm::abs(chunk_pair->first - chunk_position_to_render_around)) > radius + 2 && chunk_pair->second->terrainPopulationFinished ){
             SimpleTimer timer;
 
             
@@ -80,6 +95,50 @@ void World::removeFarChunks(glm::vec3 block_position_to_render_around){
         }
     }
 
+
+}
+
+void* World::on_thread_gen_mesh(void){
+
+    while(true){
+
+        // Wait until main thread enqueues a chunk
+        std::unique_lock<std::mutex> lk(chunk_mesh_gen_m);
+        chunk_mesh_gen_cv.wait(lk, [&]{return !chunks_for_mesh_gen.empty();});
+
+        Chunk* chunk = chunks_for_mesh_gen.front();
+        chunks_for_mesh_gen.pop();
+        lk.unlock();
+
+        // Build the mesh
+        SimpleTimer timer;
+        chunk->generateGreedyMesh();
+        interface->chunkMeshGenTime->enqueue(timer.end());
+        chunk->mesh->isFullyGenerated = true;
+    }
+    std::cout<<"Error: chunk meshing thread exiting"<<std::endl;
+    pthread_exit(0);
+
+}
+
+void* World::on_thread_chunk_init(void){
+
+    while(true){
+        
+        // Wait until a chunk to init is enqueued
+        std::unique_lock<std::mutex> lk(chunks_for_init_m);
+        chunks_for_init_cv.wait(lk, [&]{return !chunks_for_init.empty();});
+
+        // Get the chunk and unlock
+        Chunk* chunk = chunks_for_init.front();
+        chunks_for_init.pop();
+        lk.unlock();
+
+        //Initialise the chunk, which is just do the terrain for now.
+        chunk->initialiseTerrain();
+    }
+    std::cout<<"Error: chunk initialising thread exiting"<<std::endl;
+    pthread_exit(0);
 
 }
 
@@ -108,8 +167,6 @@ void World::addNewChunks(glm::vec3 block_position_to_render_around){
             worldChunks[chunk_to_add_pos] = new_chunk;
             // printf("Adding chunk with chunk index:  %d %d %d  \n", chunk_to_add_pos.x,chunk_to_add_pos.y,chunk_to_add_pos.z);
 
-
-            
             interface->chunkInitTime->enqueue(timer.end());
 
             if(chunks_added_this_frame >= 1){
@@ -140,9 +197,16 @@ void World::render( Camera &camera){
     // glm::mat4 projection = glm::mat4(1.0f);
     renderer->my_shader.setMat4("projection", projection);
 
+    // frame_counter++;
+
+    // if (frame_counter % 100 == 0){
+    //     printf("Chunks for init queue length: %d \n", chunks_for_init.size());
+    //     printf("Chunks for meshing queue length: %d \n", );
+    // }
+
+    interface->chunk_mesh_gen_queue_size = chunks_for_mesh_gen.size();
+    interface->chunk_init_queue_size = chunks_for_init.size();
     
-
-
     cleanStoredChunks(camera.Position / CAMERA_TO_WORLD_POS_SCALE);
 
     for (auto& chunk_pair : worldChunks){

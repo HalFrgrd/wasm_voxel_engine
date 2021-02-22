@@ -7,7 +7,7 @@ int Chunk::flattenCoords(int i, int j, int k){
     // if(val < 0 || val >= chunkSize*chunkSize*chunkSize){
     //     std::cout<<val<<i<<j<<k<<std::endl;
     // }
-    return i + chunkSize*j + chunkSize*chunkSize*k;
+    return val;
 }
 
 int Chunk::flattenCoords(glm::ivec3 coords){
@@ -44,6 +44,7 @@ Block::BlockType Chunk::getBlockFromWorld(glm::ivec3 coords){
         }
 
     // return Block::BLOCK_AIR;
+    // return terr
     return my_world->worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
 };
 
@@ -55,47 +56,46 @@ void Chunk::setChunkCoords(int x, int y, int z){
 }
 
 // Chunk::Chunk(World& initWorld): my_world(initWorld) {
-Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* terrain, Renderer *initRenderer) {
+Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* initTerrain, Renderer *initRenderer) {
     
     mesh = new ChunkMesh(initRenderer);
 
     my_world = initWorld;
     interface = initInterface;
+    terrain = initTerrain;
 
     chunkX = _chunkX;
     chunkY = _chunkY;
     chunkZ = _chunkZ;
 
-    for(int k = 0; k < chunkSize; k++){
-        for(int i = 0; i < chunkSize; i++){
-            for(int j = 0; j < chunkSize; j++){
-                // int heightThreshold = 4+ (rand()%4);
-                // if(j > heightThreshold){
-                //     cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_AIR;
-                // } else{
-                //     if(rand()%5 == 1){
-                //         cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_DIRT;
-                //     }else{
-                //         cubePositions[flattenCoords(i,j,k)] = Block::BLOCK_STONE;
-                //     }
-                // }
-                cubePositions[flattenCoords(i,j,k)] = terrain->getBlock(localPosToGlobalPos(i,j,k));
-                if(cubePositions[flattenCoords(i,j,k)] != Block::BLOCK_AIR){
-                    isEmpty = false;
-                }
-            }
-        }
+    // Start mesh generation on other thread
+    {
+        std::lock_guard<std::mutex> lk(my_world->chunks_for_init_m);
+        my_world->chunks_for_init.push(this);
     }
-
-    // for(int m = 0; m < chunkSize*chunkSize*chunkSize; m++){
-    //     std::cout<<cubePositions[m]<<std::endl;
-    // }
+    my_world->chunks_for_init_cv.notify_one();
 
 
 }
 
+void Chunk::initialiseTerrain() {
+    int block_coords = 0;
+    for(int k = 0; k < chunkSize; k++){
+        for(int i = 0; i < chunkSize; i++){
+            for(int j = 0; j < chunkSize; j++){
+                block_coords = flattenCoords(i,j,k);
+                cubePositions[block_coords] = terrain->getBlock(localPosToGlobalPos(i,j,k));
+                isEmpty &= (cubePositions[block_coords] == Block::BLOCK_AIR);
+            }
+        }
+    }
+
+    terrainPopulationFinished = true;
+}
+
 Chunk::~Chunk(){
     delete mesh;
+    delete [] cubePositions;
 }
 
 bool Chunk::isBlockFaceVisible(glm::ivec3 blockPos, int axis, bool isBackFace){
@@ -124,7 +124,6 @@ void Chunk::generateGreedyMesh(){
 
     // https://eddieabbondanz.io/post/voxel/greedy-mesh/
 
-    // glBindVertexArray(renderer.vao);
     glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize, chunkZ *chunkSize );
     glm::mat4 model = glm::mat4(1.0f); 
     model = glm::translate(model, chunkShift);
@@ -254,48 +253,54 @@ void Chunk::generateGreedyMesh(){
         }
     }
 
-    
-
 }
 
+
+
 void Chunk::renderChunk( Camera &camera){
+
+    if(!terrainPopulationFinished){ // can't yet build mesh
+        return;
+    }
 
     // Bind the chunk's vertex array
     glBindVertexArrayOES( (mesh->vertex_array_buffer) );
 
-    if( ! lastMeshStillValid){
-
-        SimpleTimer timer;
-        generateGreedyMesh();
-        interface->chunkMeshGenTime->enqueue(timer.end());
-
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
-        glBufferData(GL_ARRAY_BUFFER, (mesh->colours).size()*sizeof(GLfloat), &(mesh->colours[0]), GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
-        glBufferData(GL_ARRAY_BUFFER, (mesh->vertices).size()*sizeof(GLfloat), &(mesh->vertices[0]), GL_STATIC_DRAW);
+    if( ! lastMeshStillValid){ // we have to generate the mesh
         
+        meshUnbuffered = false;
+
+        // Start mesh generation on other thread
+        {
+            std::lock_guard<std::mutex> lk(my_world->chunk_mesh_gen_m);
+            my_world->chunks_for_mesh_gen.push(this);
+        }
+        my_world->chunk_mesh_gen_cv.notify_one();
+
         lastMeshStillValid = true;
-    }else{
-        // Just bind my buffers
-        // glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
-        // glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
-    }
-
-    if(mesh->vertices.size() == 0 && ! declaredNoDraw){
-        interface->chunksNoDrawCall++;
-        declaredNoDraw = true;
-        return;
+       
     }
     
-    // renderer.my_shader.setVec3("main_colour", glm::vec3(0.9,0.5,0.1));
 
-    // std::cout<<mesh.vertices.size()<<std::endl;
-    
-    glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size()*sizeof(GLfloat)/3);
-    
-    // renderer.my_shader.setVec3("main_colour", glm::vec3(0.0,0.0,0.0));
-    // glDrawArrays(GL_LINES, 0, mesh.vertices.size());
+    if(mesh->isFullyGenerated){
+        if(mesh->vertices.size() == 0){ // Mesh is empty
+            if( !declaredNoDraw){ // This is the first time we find the mesh empty
+                interface->chunksNoDrawCall++;
+                declaredNoDraw = true;
+            }
+            return;
+        }
 
+        if(!meshUnbuffered){ // first time we have found the mesh to be generated
+            glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
+            glBufferData(GL_ARRAY_BUFFER, (mesh->colours).size()*sizeof(GLfloat), &(mesh->colours[0]), GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
+            glBufferData(GL_ARRAY_BUFFER, (mesh->vertices).size()*sizeof(GLfloat), &(mesh->vertices[0]), GL_STATIC_DRAW);
+            meshUnbuffered = true;
+        }
+        glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size()*sizeof(GLfloat)/3);
+    }
+    
 }
 

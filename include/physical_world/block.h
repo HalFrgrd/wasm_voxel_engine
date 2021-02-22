@@ -30,7 +30,7 @@ namespace Block{
     }
 
     inline bool isSolid(BlockType block){
-        return block != BLOCK_AIR;
+        return block == BLOCK_STONE;
     }
 
     const GLfloat vertices[10*6*3] = {

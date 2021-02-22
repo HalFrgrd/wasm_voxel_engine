@@ -18,7 +18,7 @@ public:
 
         float temp_noise = noise.GetNoise((float)pos.x,(float)pos.z);
 
-        if(pos.y + temp_noise*10 > 0){
+        if(pos.y  + temp_noise*30 > 0){ 
             return Block::BLOCK_AIR;
         }
         return Block::BLOCK_STONE;

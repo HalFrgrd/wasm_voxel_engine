@@ -17,6 +17,33 @@
 #include "world.h"
 #include "interface.h"
 
+
+// Calculate Fibonacci numbers shared function
+int fibonacci(int iterations) {
+    int     val = 1;
+    int     last = 0;
+
+    if (iterations == 0) {
+        return 0;
+    }
+    for (int i = 1; i < iterations; i++) {
+        int     seq;
+
+        seq = val + last;
+        last = val;
+        val = seq;
+    }
+    return val;
+}
+
+void *PrintHello(void *threadid) {
+   long tid;
+   tid = (long)threadid;
+   std::cout << "Hello World! Thread ID, " << tid << std::endl;
+   pthread_exit(NULL);
+}
+
+
 // Emscripten requires to have full control over the main loop. We're going to store our SDL book-keeping variables globally.
 // Having a single function that acts as a loop prevents us to store state in the stack of said function. So we need some location for this.
 // SDL_Window*     g_Window = NULL;
@@ -33,11 +60,11 @@ int main()
     Renderer renderer;
     renderer.initRender();
 
-    GUI_Interface interface(&renderer);
+    Camera camera(glm::vec3(0.0f, 10.0f, 3.0f));
+
+    GUI_Interface interface(&renderer, &camera);
 
     World world(&renderer, &interface);
-
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     EventHandler events(&camera, &interface);
     SDL_Event eventHolder;

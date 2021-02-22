@@ -1,7 +1,7 @@
 #include "interface.h"
 
 
-GUI_Interface::GUI_Interface(Renderer *initRenderer): renderer(initRenderer) {
+GUI_Interface::GUI_Interface(Renderer *initRenderer, Camera *initCamera): renderer(initRenderer), camera(initCamera) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -59,6 +59,25 @@ void GUI_Interface::update(){
             ImGui::Text("Chunks mesh gen time: %d", chunkMeshGenTime->average());
             ImGui::Text("Chunks del time: %d", chunkDelTime->average());
             ImGui::Text("Chunks with empty mesh: %d", chunksNoDrawCall);
+            ImGui::TreePop();
+        }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if( ImGui::TreeNode("Multithreading")){
+            // NOT USING A MUTEX HERE
+            ImGui::Text("Chunk mesh gen queue size: %d", chunk_mesh_gen_queue_size);
+            ImGui::Text("Chunk init queue size: %d", chunk_init_queue_size);
+            ImGui::TreePop();
+        }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if( ImGui::TreeNode("Camera")){
+            ImGui::Text("Camera pos x: %f", camera->Position.x);
+            ImGui::Text("Camera pos y: %f", camera->Position.y);
+            ImGui::Text("Camera pos z: %f", camera->Position.z);
+            ImGui::Text("Camera front x: %f", camera->Front.x);
+            ImGui::Text("Camera front y: %f", camera->Front.y);
+            ImGui::Text("Camera front z: %f", camera->Front.z);
             ImGui::TreePop();
         }
         
