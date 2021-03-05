@@ -70,6 +70,9 @@ public:
     // Length of chunk init queue
     int chunk_init_queue_size = 0;
 
+    //Camera chunks pos
+    glm::ivec3 camera_chunk_pos = glm::ivec3(0);
+
     GUI_Interface(Renderer *initRenderer, Camera *initCamera);
 
     void update();

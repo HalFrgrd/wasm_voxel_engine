@@ -35,7 +35,6 @@ void GUI_Interface::update(){
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(renderer->window);
     ImGui::NewFrame();
-
      
 
     // For some reason the demo window needs to be rendered once for something to show
@@ -72,14 +71,20 @@ void GUI_Interface::update(){
 
         ImGui::SetNextItemOpen(true, ImGuiCond_Once);
         if( ImGui::TreeNode("Camera")){
-            ImGui::Text("Camera pos x: %f", camera->Position.x);
-            ImGui::Text("Camera pos y: %f", camera->Position.y);
-            ImGui::Text("Camera pos z: %f", camera->Position.z);
+            glm::vec3 camWorldPos = camera->getCameraWorldPos();
+            ImGui::Text("Camera pos x: %f", camWorldPos.x);
+            ImGui::Text("Camera pos y: %f", camWorldPos.y);
+            ImGui::Text("Camera pos z: %f", camWorldPos.z);
+            ImGui::Text("Camera chunk pos x: %d", camera_chunk_pos.x);
+            ImGui::Text("Camera chunk pos y: %d", camera_chunk_pos.y);
+            ImGui::Text("Camera chunk pos z: %d", camera_chunk_pos.z);
             ImGui::Text("Camera front x: %f", camera->Front.x);
             ImGui::Text("Camera front y: %f", camera->Front.y);
             ImGui::Text("Camera front z: %f", camera->Front.z);
             ImGui::TreePop();
         }
+
+        
         
         ImGui::End();
     }

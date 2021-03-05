@@ -71,6 +71,10 @@ public:
         return glm::scale(glm::lookAt(Position, Position + Front, Up), glm::vec3(CAMERA_TO_WORLD_POS_SCALE));
     }
 
+    glm::vec3 getCameraWorldPos(){
+        return Position / CAMERA_TO_WORLD_POS_SCALE;
+    }
+
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {

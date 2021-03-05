@@ -5,7 +5,7 @@
 #include <iostream>
 #include "view.h"
 
-GLuint Renderer::getVertexArrayBuffer(){
+GLuint Renderer::createVertexArrayBuffer(){
   GLuint vao;
      
   glGenVertexArraysOES(1, &vao);
@@ -14,7 +14,7 @@ GLuint Renderer::getVertexArrayBuffer(){
   return vao;
 }
 
-GLuint Renderer::getVertexBuffer(){
+GLuint Renderer::createVertexBuffer(){
   GLuint buffer_id;
   glGenBuffers(1, &buffer_id);
   glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
@@ -26,7 +26,15 @@ GLuint Renderer::getVertexBuffer(){
   return buffer_id;
 }
 
-GLuint Renderer::getColourBuffer(){
+GLuint Renderer::createIndexBuffer(){
+  GLuint buffer_id;
+  glGenBuffers(1, &buffer_id);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_id);
+  return buffer_id;
+}
+
+
+GLuint Renderer::createColourBuffer(){
   GLuint buffer_id;
   glGenBuffers(1, &buffer_id);
   glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
@@ -44,17 +52,15 @@ void Renderer::initRender(){
   screen_height = 720;
 
   // Setup SDL
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0)
     {
         printf("Error: %s\n", SDL_GetError());
         return;
     }
 
-    // For the browser using Emscripten, we are going to use WebGL1 with GL ES2. See the Makefile. for requirement details.
-    // It is very likely the generated file won't work in many browsers. Firefox is the only sure bet, but I have successfully
-    // run this code on Chrome for Android for example.
-    const char* glsl_version = "#version 100";
-    //const char* glsl_version = "#version 300 es";
+
+    // const char* glsl_version = "#version 100";
+    const char* glsl_version = "#version 300 es";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -80,42 +86,15 @@ void Renderer::initRender(){
     //SDL_GL_SetSwapInterval(1); // Enable vsync
 
     
-
-    // context = SDL_GL_CreateContext(window);
-    // SDL_CreateWindowAndRenderer(screen_width, screen_height, 0, &window, nullptr);
-
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    // SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    // SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-    // SDL_GL_SetSwapInterval(1);
-
     glEnable(GL_DEPTH_TEST);
     // glDepthFunc(GL_LEQUAL);
-      // glFrontFace(GL_CCW);
-
+    // glFrontFace(GL_CCW);
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_FRONT_AND_BACK);
 
- 
-
-    // glGenBuffers(1, &colours);
-    // glGenBuffers(1, &vbo);
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    
+    // Initialise shaders
     my_shader.initShader("./include/shaders/vertex_shader.vs","./include/shaders/fragment_shader.fs");
     my_shader.activate();
 
-    // Specify the layout of the vertex data
-    // GLint posAttrib = my_shader.getAttribLocation("position");
-    // glEnableVertexAttribArray(posAttrib);
-    // glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, colours);
-    // GLint colourAttrib = my_shader.getAttribLocation("vertex_colour");
-    // glEnableVertexAttribArray(colourAttrib);
-    // glVertexAttribPointer(colourAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
 }

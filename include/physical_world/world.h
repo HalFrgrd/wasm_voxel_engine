@@ -1,6 +1,12 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#define GL_GLEXT_PROTOTYPES 1
+
+#include <emscripten.h>
+#include <SDL.h>
+#include <SDL_opengles2.h>
+
 // #include "chunk.h"
 #include "view.h"
 #include "camera.h"
@@ -23,25 +29,26 @@ class Chunk;
 
 class World{
 public:
+    World(Renderer *initRenderer, GUI_Interface *initInterface);
     std::unordered_map<glm::ivec3, Chunk*> worldChunks;
     TerrainGenerator terrain;
-    
-    World(Renderer *initRenderer, GUI_Interface *initInterface);
     Renderer *renderer;
     GUI_Interface *interface;
 
-    // Count how many frames there have been, used for debugging
-    // long frame_counter = 0;
-
     void render(Camera &camera);
+    glm::vec3 blockPosToRenderAround; // center of rendering
+    glm::ivec3 chunk_position_to_render_around;
+    bool shouldRenderChunk(Chunk *chunk);
+
+
 
     // Chunk renderering
     const static int radius = 3;
-    void removeFarChunks(glm::vec3 block_position_to_render_around);
-    void addNewChunks(glm::vec3 block_position_to_render_around);
-    void cleanStoredChunks(glm::vec3 block_position_to_render_around);
+    void removeFarChunks();
+    void addNewChunks();
+    void cleanStoredChunks();
 
-    Block::BlockType worldgetBlockFromWorld(int blockX, int blockY, int blockZ);
+    Block::BlockType worldgetBlockFromWorld(glm::ivec3 blockPos);
 
     Chunk* getChunk(int chunkX, int chunkY, int chunkZ);
 

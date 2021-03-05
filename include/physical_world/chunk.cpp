@@ -1,40 +1,25 @@
 #include "chunk.h"
 
-
-
-int Chunk::flattenCoords(int i, int j, int k){
-    int val = i + chunkSize*j + chunkSize*chunkSize*k;
-    // if(val < 0 || val >= chunkSize*chunkSize*chunkSize){
-    //     std::cout<<val<<i<<j<<k<<std::endl;
-    // }
-    return val;
-}
-
-int Chunk::flattenCoords(glm::ivec3 coords){
-    return flattenCoords(coords.x,coords.y,coords.z);
+inline int Chunk::flattenCoords(glm::ivec3 coords){
+    return coords.x + chunkSize*coords.y + chunkSize*chunkSize*coords.z;
 };
 
 
-glm::ivec3 Chunk::unflattenCoords(int i){
+inline glm::ivec3 Chunk::unflattenCoords(int i){
     return glm::ivec3(i% (chunkSize), (i/chunkSize)%chunkSize, (i/(chunkSize*chunkSize))%chunkSize  );
 }
 
-glm::ivec3 Chunk::localPosToGlobalPos(int x, int y, int z){
-    return glm::ivec3(chunkX*chunkSize + x,chunkY*chunkSize + y,chunkZ*chunkSize + z);
+inline glm::ivec3 Chunk::localPosToGlobalPos(glm::ivec3 localBlockPos){
+    return chunkPos * chunkSize + localBlockPos;
 }
 
-Block::BlockType Chunk::getBlockFromChunk(glm::ivec3 coords){
-    Block::BlockType return_block = cubePositions[flattenCoords(coords)];
-    // if(return_block != 0 || return_block != 3){
-    //     std::cout<< return_block <<std::endl;
-    //     std::cout<<coords.x<<" "<<coords.y<<" "<<coords.z<<std::endl;
-    // }
-    return return_block; 
+inline Block::BlockType Chunk::getBlockFromChunk(glm::ivec3 coords){
+    return cubePositions[flattenCoords(coords)]; 
 }
 
 
 
-Block::BlockType Chunk::getBlockFromWorld(glm::ivec3 coords){
+inline  Block::BlockType Chunk::getBlockFromWorld(glm::ivec3 coords){
 
     if(coords.x >=0 && coords.x < chunkSize &&
         coords.y >=0 && coords.y < chunkSize &&
@@ -42,21 +27,11 @@ Block::BlockType Chunk::getBlockFromWorld(glm::ivec3 coords){
         {
             return getBlockFromChunk(coords);
         }
-
-    // return Block::BLOCK_AIR;
-    // return terr
-    return my_world->worldgetBlockFromWorld(chunkX*chunkSize + coords.x,chunkY*chunkSize + coords.y,chunkZ*chunkSize + coords.z );
+    return my_world->worldgetBlockFromWorld( localPosToGlobalPos(coords) );
 };
 
 
-void Chunk::setChunkCoords(int x, int y, int z){
-    chunkX = x;
-    chunkY = y;
-    chunkZ = z;
-}
-
-// Chunk::Chunk(World& initWorld): my_world(initWorld) {
-Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _chunkY, int _chunkZ, TerrainGenerator* initTerrain, Renderer *initRenderer) {
+Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, glm::ivec3 initChunkPos, TerrainGenerator* initTerrain, Renderer *initRenderer) {
     
     mesh = new ChunkMesh(initRenderer);
 
@@ -64,11 +39,10 @@ Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _c
     interface = initInterface;
     terrain = initTerrain;
 
-    chunkX = _chunkX;
-    chunkY = _chunkY;
-    chunkZ = _chunkZ;
+    chunkPos = initChunkPos;
 
-    // Start mesh generation on other thread
+    // Do terrain initialisation on another thread
+    doNotDelete = true;
     {
         std::lock_guard<std::mutex> lk(my_world->chunks_for_init_m);
         my_world->chunks_for_init.push(this);
@@ -80,11 +54,11 @@ Chunk::Chunk(World *initWorld, GUI_Interface *initInterface, int _chunkX, int _c
 
 void Chunk::initialiseTerrain() {
     int block_coords = 0;
-    for(int k = 0; k < chunkSize; k++){
-        for(int i = 0; i < chunkSize; i++){
-            for(int j = 0; j < chunkSize; j++){
-                block_coords = flattenCoords(i,j,k);
-                cubePositions[block_coords] = terrain->getBlock(localPosToGlobalPos(i,j,k));
+    for(int i = 0; i < chunkSize; i++){
+        for(int j = 0; j < chunkSize; j++){
+            for(int k = 0; k < chunkSize; k++){
+                block_coords = flattenCoords(glm::ivec3(i,j,k));
+                cubePositions[block_coords] = terrain->getBlock(localPosToGlobalPos( glm::ivec3(i,j,k)));
                 isEmpty &= (cubePositions[block_coords] == Block::BLOCK_AIR);
             }
         }
@@ -124,7 +98,7 @@ void Chunk::generateGreedyMesh(){
 
     // https://eddieabbondanz.io/post/voxel/greedy-mesh/
 
-    glm::vec3 chunkShift = glm::vec3(chunkX * chunkSize, chunkY * chunkSize, chunkZ *chunkSize );
+    glm::vec3 chunkShift = chunkPos * chunkSize;
     glm::mat4 model = glm::mat4(1.0f); 
     model = glm::translate(model, chunkShift);
     
@@ -255,26 +229,70 @@ void Chunk::generateGreedyMesh(){
 
 }
 
+void Chunk::renderChunkOutline() {
+    std::vector<GLfloat> corners;
+    // corners.push_back(chunkX*chunkSize);
+    // corners.push_back(chunkY*chunkSize);
+    // corners.push_back(chunkZ*chunkSize);
+
+    // corners.push_back((chunkX+1)*chunkSize);
+    // corners.push_back((chunkY)*chunkSize);
+    // corners.push_back((chunkZ)*chunkSize);
+
+    // corners.push_back((chunkX+1)*chunkSize);
+    // corners.push_back((chunkY+1)*chunkSize);
+    // corners.push_back((chunkZ)*chunkSize);
+
+    // corners.push_back((chunkX)*chunkSize);
+    // corners.push_back((chunkY+1)*chunkSize);
+    // corners.push_back((chunkZ)*chunkSize);
+
+    // corners.push_back((chunkX)*chunkSize);
+    // corners.push_back((chunkY+1)*chunkSize);
+    // corners.push_back((chunkZ+1)*chunkSize);
+
+    // corners.push_back((chunkX)*chunkSize);
+    // corners.push_back((chunkY)*chunkSize);
+    // corners.push_back((chunkZ+1)*chunkSize);
+
+    // corners.push_back((chunkX+1)*chunkSize);
+    // corners.push_back((chunkY)*chunkSize);
+    // corners.push_back((chunkZ+1)*chunkSize);
+
+    // corners.push_back((chunkX+1)*chunkSize);
+    // corners.push_back((chunkY+1)*chunkSize);
+    // corners.push_back((chunkZ+1)*chunkSize);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, corners.size()*sizeof(GLfloat), &(corners[0]), GL_STATIC_DRAW);
+    glDrawArrays(GL_LINE_STRIP, 0, corners.size());
+}
 
 
-void Chunk::renderChunk( Camera &camera){
 
-    if(!terrainPopulationFinished){ // can't yet build mesh
-        return;
-    }
+void Chunk::renderChunk(){
 
     // Bind the chunk's vertex array
     glBindVertexArrayOES( (mesh->vertex_array_buffer) );
 
+    // Used for debugging
+    // renderChunkOutline();
+    
+    if(!terrainPopulationFinished){ // can't yet build mesh
+        return;
+    }
+
     if( ! lastMeshStillValid){ // we have to generate the mesh
         
-        meshUnbuffered = false;
+        isMeshInBuffer = false;
 
         // Start mesh generation on other thread
+        doNotDelete = true; // don't delete this chunk whilst other threads are using it
         {
             std::lock_guard<std::mutex> lk(my_world->chunk_mesh_gen_m);
             my_world->chunks_for_mesh_gen.push(this);
         }
+        // Wake up the thread to generate our mesh
         my_world->chunk_mesh_gen_cv.notify_one();
 
         lastMeshStillValid = true;
@@ -291,15 +309,18 @@ void Chunk::renderChunk( Camera &camera){
             return;
         }
 
-        if(!meshUnbuffered){ // first time we have found the mesh to be generated
-            glBindBuffer(GL_ARRAY_BUFFER, mesh->colour_buffer);
-            glBufferData(GL_ARRAY_BUFFER, (mesh->colours).size()*sizeof(GLfloat), &(mesh->colours[0]), GL_STATIC_DRAW);
-
-            glBindBuffer(GL_ARRAY_BUFFER, mesh->vertex_buffer);
-            glBufferData(GL_ARRAY_BUFFER, (mesh->vertices).size()*sizeof(GLfloat), &(mesh->vertices[0]), GL_STATIC_DRAW);
-            meshUnbuffered = true;
+        if(!isMeshInBuffer){ // first time we have found the mesh to be generated
+            mesh->bufferMesh();
+            isMeshInBuffer = true;
         }
-        glDrawArrays(GL_TRIANGLES, 0, (mesh->vertices).size()*sizeof(GLfloat)/3);
+
+        // Draw the mesh
+        glDrawElements(
+            GL_TRIANGLES,
+            (mesh->indices).size(),
+            GL_UNSIGNED_INT,
+            (void*)0
+        );
     }
     
 }
